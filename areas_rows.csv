@@ -1,0 +1,176 @@
+﻿id;unidade;nome;centro_de_custo;responsavel_id;responsavel;cor;status
+1;HOSPITAL DO CORACAO;Diretoria Assistencial;HC - Administracao de Enfermagem;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+2;HOSPITAL DO CORACAO;Diretoria Assistencial;HC - CME;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+3;HOSPITAL DO CORACAO;Diretoria Assistencial;HC - Centro Cirurgico;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+4;HOSPITAL DO CORACAO;Diretoria Assistencial;HC - Ecocardiograma;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+5;HOSPITAL DO CORACAO;Diretoria Assistencial;HC - Eletrocardiograma;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+6;HOSPITAL DO CORACAO;Diretoria Assistencial;HC - Gestão de Leitos;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+7;HOSPITAL DO CORACAO;Diretoria Assistencial;HC - Hemodinamica;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+8;HOSPITAL DO CORACAO;Diretoria Assistencial;HC - Internamento;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+9;HOSPITAL DO CORACAO;Diretoria Assistencial;HC - Laboratorio;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+10;HOSPITAL DO CORACAO;Diretoria Assistencial;HC - Mapa / Holter;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+11;HOSPITAL DO CORACAO;Diretoria Assistencial;HC - Psicologia;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+12;HOSPITAL DO CORACAO;Diretoria Assistencial;HC - Raio X;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+13;HOSPITAL DO CORACAO;Diretoria Assistencial;HC - Teste Ergométrico;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+14;HOSPITAL DO CORACAO;Diretoria Assistencial;HC - UTI Cardiologica;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+15;HOSPITAL DO CORACAO;Diretoria Assistencial;HC - Unidade de Emergencia;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+16;HOSPITAL PRIMAVERA;Diretoria Assistencial;HP - Administracao de Enfermagem;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+17;HOSPITAL PRIMAVERA;Diretoria Assistencial;HP - Administracao de Equipe Multidisciplinar;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+18;HOSPITAL PRIMAVERA;Diretoria Assistencial;HP - Agendamento Cirurgico;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+19;HOSPITAL PRIMAVERA;Diretoria Assistencial;HP - CME - Central de Materiais Esterilizados;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+20;HOSPITAL PRIMAVERA;Diretoria Assistencial;HP - Centro Cirurgico;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+21;HOSPITAL PRIMAVERA;Diretoria Assistencial;HP - Centro de Ensino e Pesquisa;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+22;HOSPITAL PRIMAVERA;Diretoria Assistencial;HP - Comissao de Pele;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+23;HOSPITAL PRIMAVERA;Diretoria Assistencial;HP - EMTN;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+24;HOSPITAL PRIMAVERA;Diretoria Assistencial;HP - Escritorio de Experiencia Paciente;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+25;HOSPITAL PRIMAVERA;Diretoria Assistencial;HP - Farmacia Clinica;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+26;HOSPITAL PRIMAVERA;Diretoria Assistencial;HP - Farmacia Satelite Oncologia;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+27;HOSPITAL PRIMAVERA;Diretoria Assistencial;HP - Gestao de Leitos;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+28;HOSPITAL PRIMAVERA;Diretoria Assistencial;HP - Hemodialise;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+29;HOSPITAL PRIMAVERA;Diretoria Assistencial;HP - Hemodinamica;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+30;HOSPITAL PRIMAVERA;Diretoria Assistencial;HP - Internamento - Administrativo;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+31;HOSPITAL PRIMAVERA;Diretoria Assistencial;HP - Internamento Pediatrico;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+32;HOSPITAL PRIMAVERA;Diretoria Assistencial;HP - Laboratorio de Analises Clinicas;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+33;HOSPITAL PRIMAVERA;Diretoria Assistencial;HP - NAE - Nucleo de Autorizacoes Eletivas;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+34;HOSPITAL PRIMAVERA;Diretoria Assistencial;HP - Nucleo de Desenvolvimento de Projetos;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+35;HOSPITAL PRIMAVERA;Diretoria Assistencial;HP - Nucleo de Internamento;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+36;HOSPITAL PRIMAVERA;Diretoria Assistencial;HP - Pediatria - Administrativo;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+37;HOSPITAL PRIMAVERA;Diretoria Assistencial;HP - Posto de Coleta Drive Thru;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+38;HOSPITAL PRIMAVERA;Diretoria Assistencial;HP - Psicologia;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+39;HOSPITAL PRIMAVERA;Diretoria Assistencial;HP - Qualidade e Praticas Assistenciais;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+40;HOSPITAL PRIMAVERA;Diretoria Assistencial;HP - Quimioterapia/Infusao;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+41;HOSPITAL PRIMAVERA;Diretoria Assistencial;HP - Serviço Social;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+42;HOSPITAL PRIMAVERA;Diretoria Assistencial;HP - U.I 3. Andar - Bloco A;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+43;HOSPITAL PRIMAVERA;Diretoria Assistencial;HP - U.I 4. Andar;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+44;HOSPITAL PRIMAVERA;Diretoria Assistencial;HP - U.I 4. Andar - Bloco A;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+45;HOSPITAL PRIMAVERA;Diretoria Assistencial;HP - U.I 5. Andar;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+46;HOSPITAL PRIMAVERA;Diretoria Assistencial;HP - U.I 5. Andar - Bloco A;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+47;HOSPITAL PRIMAVERA;Diretoria Assistencial;HP - U.I 6. Andar;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+48;HOSPITAL PRIMAVERA;Diretoria Assistencial;HP - U.I 6. Andar - Bloco A;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+49;HOSPITAL PRIMAVERA;Diretoria Assistencial;HP - U.I 7. Andar;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+50;HOSPITAL PRIMAVERA;Diretoria Assistencial;HP - U.I 7. Andar - Bloco A;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+51;HOSPITAL PRIMAVERA;Diretoria Assistencial;HP - UTI Cirurgica;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+52;HOSPITAL PRIMAVERA;Diretoria Assistencial;HP - UTI Clinica;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+53;HOSPITAL PRIMAVERA;Diretoria Assistencial;HP - UTI Pediatrica;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+54;HOSPITAL PRIMAVERA;Diretoria Assistencial;HP - Unidade de Emergencia;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+55;HOSPITAL PRIMAVERA;Diretoria Assistencial;HP - Unidade de Emergencia Pediatrico;2;ALINE DE CARVALHO BASTOS;#CCCCCC;ativa
+56;#N/D;Secretaria Executiva;(Nenhum encontrado);2;ALVACY BRITO DOS SANTOS PEREIRA;#CCCCCC;ativa
+57;HOSPITAL DO CORACAO;Operações;HC - Farmacia Central;2;ALYSSON SANTOS OLIVEIRA;#CCCCCC;ativa
+58;HOSPITAL DO CORACAO;Operações;HC - Hospitalidade;2;ALYSSON SANTOS OLIVEIRA;#CCCCCC;ativa
+59;HOSPITAL DO CORACAO;Operações;HC - SND;2;ALYSSON SANTOS OLIVEIRA;#CCCCCC;ativa
+60;HOSPITAL PRIMAVERA;Operações;HP - Almoxarifado;2;ALYSSON SANTOS OLIVEIRA;#CCCCCC;ativa
+61;HOSPITAL PRIMAVERA;Operações;HP - Engenharia Clinica;2;ALYSSON SANTOS OLIVEIRA;#CCCCCC;ativa
+62;HOSPITAL PRIMAVERA;Operações;HP - Farmacia Bloco Cirurgico;2;ALYSSON SANTOS OLIVEIRA;#CCCCCC;ativa
+63;HOSPITAL PRIMAVERA;Operações;HP - Farmacia Central (C.A.F.);2;ALYSSON SANTOS OLIVEIRA;#CCCCCC;ativa
+64;HOSPITAL PRIMAVERA;Operações;HP - Farmacia Satelite Oncologia;2;ALYSSON SANTOS OLIVEIRA;#CCCCCC;ativa
+65;HOSPITAL PRIMAVERA;Operações;HP - Farmacia Satelite UTI Clinica;2;ALYSSON SANTOS OLIVEIRA;#CCCCCC;ativa
+66;HOSPITAL PRIMAVERA;Operações;HP - Farmacia Satelite UTI Pediatrica;2;ALYSSON SANTOS OLIVEIRA;#CCCCCC;ativa
+67;HOSPITAL PRIMAVERA;Operações;HP - Farmacia Satelite Unidade de Emergencia;2;ALYSSON SANTOS OLIVEIRA;#CCCCCC;ativa
+68;HOSPITAL PRIMAVERA;Operações;HP - Farmacia UTI 2° andar;2;ALYSSON SANTOS OLIVEIRA;#CCCCCC;ativa
+69;HOSPITAL PRIMAVERA;Operações;HP - Hospitalidade;2;ALYSSON SANTOS OLIVEIRA;#CCCCCC;ativa
+70;HOSPITAL PRIMAVERA;Operações;HP - Lactario;2;ALYSSON SANTOS OLIVEIRA;#CCCCCC;ativa
+71;HOSPITAL PRIMAVERA;Operações;HP - Manutencao e Conservacao;2;ALYSSON SANTOS OLIVEIRA;#CCCCCC;ativa
+72;HOSPITAL PRIMAVERA;Operações;HP - Oficina de Moveis e Utensilios;2;ALYSSON SANTOS OLIVEIRA;#CCCCCC;ativa
+73;HOSPITAL PRIMAVERA;Operações;HP - Reformas - NDP;2;ALYSSON SANTOS OLIVEIRA;#CCCCCC;ativa
+74;HOSPITAL PRIMAVERA;Operações;HP - SND - Servico de Nutricao e Dietetica;2;ALYSSON SANTOS OLIVEIRA;#CCCCCC;ativa
+75;HOSPITAL PRIMAVERA;Operações;HP - Seguranca e Vigilancia;2;ALYSSON SANTOS OLIVEIRA;#CCCCCC;ativa
+76;HOSPITAL PRIMAVERA;Operações;HP - Transporte;2;ALYSSON SANTOS OLIVEIRA;#CCCCCC;ativa
+77;HOSPITAL PRIMAVERA;Marketing;HP - Marketing;2;ANNE CAROLINE ANDRADE TRINDADE;#CCCCCC;ativa
+78;HOSPITAL PRIMAVERA;Financeiro;HP - Controladoria;2;CAROLAYNE ARISTIDES VASCONCELOS;#CCCCCC;ativa
+79;HOSPITAL PRIMAVERA;Financeiro;HP - Financeiro;2;CAROLAYNE ARISTIDES VASCONCELOS;#CCCCCC;ativa
+80;HOSPITAL PRIMAVERA;Contabilidade;HP - Contabilidade;2;CLAUDETE RIBEIRO SANTOS;#CCCCCC;ativa
+81;HOSPITAL DO CORACAO;Diretoria de TI;HC - Tecnologia da informacao;2;EDUARDO ALVES SILVA;#CCCCCC;ativa
+82;HOSPITAL PRIMAVERA;Diretoria de TI;HP - Central de Agendamento - Call Center;2;EDUARDO ALVES SILVA;#CCCCCC;ativa
+83;HOSPITAL PRIMAVERA;Diretoria de TI;HP - Tecnologia da Informacao;2;EDUARDO ALVES SILVA;#CCCCCC;ativa
+84;HOSPITAL PRIMAVERA;Diretoria Comercial;HP - Auditoria de Contas Medicas;2;FABIANA KATSUKE TATEMTSU FULANETE;#CCCCCC;ativa
+85;HOSPITAL PRIMAVERA;Diretoria Comercial;HP - Autorizacoes Internados;2;FABIANA KATSUKE TATEMTSU FULANETE;#CCCCCC;ativa
+86;HOSPITAL PRIMAVERA;Diretoria Comercial;HP - Comercial;2;FABIANA KATSUKE TATEMTSU FULANETE;#CCCCCC;ativa
+87;HOSPITAL PRIMAVERA;Diretoria Comercial;HP - Inteligencia de Mercado;2;FABIANA KATSUKE TATEMTSU FULANETE;#CCCCCC;ativa
+88;HOSPITAL PRIMAVERA;Diretoria Comercial;HP - Recurso de Glosas/Contas a Receber;2;FABIANA KATSUKE TATEMTSU FULANETE;#CCCCCC;ativa
+89;HOSPITAL PRIMAVERA;Diretoria Comercial;HP - SAME;2;FABIANA KATSUKE TATEMTSU FULANETE;#CCCCCC;ativa
+90;HOSPITAL DO CORACAO;Superintendência de Gente e Gestão;HC - Segurança do Trabalho;2;GISELE BORGES DE OLIVEIRA;#CCCCCC;ativa
+91;HOSPITAL PRIMAVERA;Superintendência de Gente e Gestão;HP - Administracao de Pessoal;2;GISELE BORGES DE OLIVEIRA;#CCCCCC;ativa
+92;HOSPITAL PRIMAVERA;Superintendência de Gente e Gestão;HP - Desenvolvimento Organizacional;2;GISELE BORGES DE OLIVEIRA;#CCCCCC;ativa
+93;HOSPITAL PRIMAVERA;Superintendência de Gente e Gestão;HP - NEC - Nucleo de Educacao Corporativa;2;GISELE BORGES DE OLIVEIRA;#CCCCCC;ativa
+94;HOSPITAL PRIMAVERA;Superintendência de Gente e Gestão;HP - Recrutamento e Selecao;2;GISELE BORGES DE OLIVEIRA;#CCCCCC;ativa
+95;HOSPITAL PRIMAVERA;Superintendência de Gente e Gestão;HP - Saúde Corporativa;2;GISELE BORGES DE OLIVEIRA;#CCCCCC;ativa
+96;HOSPITAL PRIMAVERA;Superintendência de Gente e Gestão;HP - Seguranca do Trabalho;2;GISELE BORGES DE OLIVEIRA;#CCCCCC;ativa
+97;HOSPITAL PRIMAVERA;Práticas Ambulatoriais;HP - Administracao SADT;2;HERBERT CARVALHO SILVA;#CCCCCC;ativa
+98;HOSPITAL PRIMAVERA;Práticas Ambulatoriais;HP - Consultorios;2;HERBERT CARVALHO SILVA;#CCCCCC;ativa
+99;HOSPITAL PRIMAVERA;Práticas Ambulatoriais;HP - Ecocardiograma;2;HERBERT CARVALHO SILVA;#CCCCCC;ativa
+100;HOSPITAL PRIMAVERA;Práticas Ambulatoriais;HP - Eletrocardiograma;2;HERBERT CARVALHO SILVA;#CCCCCC;ativa
+101;HOSPITAL PRIMAVERA;Práticas Ambulatoriais;HP - Eletroencefalograma;2;HERBERT CARVALHO SILVA;#CCCCCC;ativa
+102;HOSPITAL PRIMAVERA;Práticas Ambulatoriais;HP - Endoscopia / Colonoscopia;2;HERBERT CARVALHO SILVA;#CCCCCC;ativa
+103;HOSPITAL PRIMAVERA;Práticas Ambulatoriais;HP - Mamografia;2;HERBERT CARVALHO SILVA;#CCCCCC;ativa
+104;HOSPITAL PRIMAVERA;Práticas Ambulatoriais;HP - Mapa/Holter;2;HERBERT CARVALHO SILVA;#CCCCCC;ativa
+105;HOSPITAL PRIMAVERA;Práticas Ambulatoriais;HP - Raio X;2;HERBERT CARVALHO SILVA;#CCCCCC;ativa
+106;HOSPITAL PRIMAVERA;Práticas Ambulatoriais;HP - Recepcao Centro de Diagnostico;2;HERBERT CARVALHO SILVA;#CCCCCC;ativa
+107;HOSPITAL PRIMAVERA;Práticas Ambulatoriais;HP - Recepcao Centro de Imagem;2;HERBERT CARVALHO SILVA;#CCCCCC;ativa
+108;HOSPITAL PRIMAVERA;Práticas Ambulatoriais;HP - Recepcao Laboratorio;2;HERBERT CARVALHO SILVA;#CCCCCC;ativa
+109;HOSPITAL PRIMAVERA;Práticas Ambulatoriais;HP - Recepcao Unidade de Emergencia;2;HERBERT CARVALHO SILVA;#CCCCCC;ativa
+110;HOSPITAL PRIMAVERA;Práticas Ambulatoriais;HP - Recepção Principal;2;HERBERT CARVALHO SILVA;#CCCCCC;ativa
+111;HOSPITAL PRIMAVERA;Práticas Ambulatoriais;HP - Ressonancia Magnetica;2;HERBERT CARVALHO SILVA;#CCCCCC;ativa
+112;HOSPITAL PRIMAVERA;Práticas Ambulatoriais;HP - Sala de Laudos;2;HERBERT CARVALHO SILVA;#CCCCCC;ativa
+113;HOSPITAL PRIMAVERA;Práticas Ambulatoriais;HP - Teste Ergometrico;2;HERBERT CARVALHO SILVA;#CCCCCC;ativa
+114;HOSPITAL PRIMAVERA;Práticas Ambulatoriais;HP - Tomografia;2;HERBERT CARVALHO SILVA;#CCCCCC;ativa
+115;HOSPITAL PRIMAVERA;Práticas Ambulatoriais;HP - Ultrassonografia;2;HERBERT CARVALHO SILVA;#CCCCCC;ativa
+116;POLICLIN AUGUSTO FRANCO;Diretoria Técnica;AF - Administracao;2;JONAS RYTHOLZ;#CCCCCC;ativa
+117;POLICLIN AUGUSTO FRANCO;Diretoria Técnica;AF - Consultorio;2;JONAS RYTHOLZ;#CCCCCC;ativa
+118;POLICLIN AUGUSTO FRANCO;Diretoria Técnica;AF - Posto de Coleta Augusto Franco;2;JONAS RYTHOLZ;#CCCCCC;ativa
+119;POLICLIN AUGUSTO FRANCO;Diretoria Técnica;AF - Recepcao Pacientes;2;JONAS RYTHOLZ;#CCCCCC;ativa
+120;POLICLIN AUGUSTO FRANCO;Diretoria Técnica;AF - Teste Ergometrico;2;JONAS RYTHOLZ;#CCCCCC;ativa
+121;CLINICA PRIMAVERA;Diretoria Técnica;AL - Administracao;2;JONAS RYTHOLZ;#CCCCCC;ativa
+122;CLINICA PRIMAVERA;Diretoria Técnica;AL - Densitometria ossea;2;JONAS RYTHOLZ;#CCCCCC;ativa
+123;CLINICA PRIMAVERA;Diretoria Técnica;AL - Entrega de Resultado;2;JONAS RYTHOLZ;#CCCCCC;ativa
+124;CLINICA PRIMAVERA;Diretoria Técnica;AL - Mamografia;2;JONAS RYTHOLZ;#CCCCCC;ativa
+125;CLINICA PRIMAVERA;Diretoria Técnica;AL - Posto de Coleta Alameda;2;JONAS RYTHOLZ;#CCCCCC;ativa
+126;DIAGNOSE BARAO MARUIM;Diretoria Técnica;BM - Administracao;2;JONAS RYTHOLZ;#CCCCCC;ativa
+127;DIAGNOSE BARAO MARUIM;Diretoria Técnica;BM - Mapa/Holter;2;JONAS RYTHOLZ;#CCCCCC;ativa
+128;DIAGNOSE BARAO MARUIM;Diretoria Técnica;BM - Posto de Coleta Barao de Maruim;2;JONAS RYTHOLZ;#CCCCCC;ativa
+129;DIAGNOSE BARAO MARUIM;Diretoria Técnica;BM - Recepcao Principal;2;JONAS RYTHOLZ;#CCCCCC;ativa
+130;DIAGNOSE CAMPOS;Diretoria Técnica;DI - Administracao;2;JONAS RYTHOLZ;#CCCCCC;ativa
+131;DIAGNOSE CAMPOS;Diretoria Técnica;DI - Densitometria ossea;2;JONAS RYTHOLZ;#CCCCCC;ativa
+132;DIAGNOSE CAMPOS;Diretoria Técnica;DI - Endoscopia/Colonoscopia;2;JONAS RYTHOLZ;#CCCCCC;ativa
+133;DIAGNOSE CAMPOS;Diretoria Técnica;DI - Mamografia;2;JONAS RYTHOLZ;#CCCCCC;ativa
+134;DIAGNOSE CAMPOS;Diretoria Técnica;DI - Mapa E Holter;2;JONAS RYTHOLZ;#CCCCCC;ativa
+135;DIAGNOSE CAMPOS;Diretoria Técnica;DI - Posto de Coleta Rua Campos;2;JONAS RYTHOLZ;#CCCCCC;ativa
+136;DIAGNOSE CAMPOS;Diretoria Técnica;DI - Pre-Faturamento;2;JONAS RYTHOLZ;#CCCCCC;ativa
+137;DIAGNOSE CAMPOS;Diretoria Técnica;DI - RESSONANCIA MAGNETICA;2;JONAS RYTHOLZ;#CCCCCC;ativa
+138;DIAGNOSE CAMPOS;Diretoria Técnica;DI - Raio X;2;JONAS RYTHOLZ;#CCCCCC;ativa
+139;DIAGNOSE CAMPOS;Diretoria Técnica;DI - Recepcao Pacientes;2;JONAS RYTHOLZ;#CCCCCC;ativa
+140;DIAGNOSE CAMPOS;Diretoria Técnica;DI - Recepcao de Consultorios;2;JONAS RYTHOLZ;#CCCCCC;ativa
+141;DIAGNOSE CAMPOS;Diretoria Técnica;DI - Teste Ergometrico/Eletrocadiograma;2;JONAS RYTHOLZ;#CCCCCC;ativa
+142;DIAGNOSE CAMPOS;Diretoria Técnica;DI - Tomografia Computadorizada;2;JONAS RYTHOLZ;#CCCCCC;ativa
+143;DIAGNOSE CAMPOS;Diretoria Técnica;DI - Usg/Duplex/Puncao;2;JONAS RYTHOLZ;#CCCCCC;ativa
+144;HOSPITAL DO CORACAO;Diretoria Técnica;HC - SCIH;2;JONAS RYTHOLZ;#CCCCCC;ativa
+145;HOSPITAL PRIMAVERA;Diretoria Técnica;HP - Diretoria Tecnica;2;JONAS RYTHOLZ;#CCCCCC;ativa
+146;HOSPITAL PRIMAVERA;Diretoria Técnica;HP - Governanca Clinica;2;JONAS RYTHOLZ;#CCCCCC;ativa
+147;HOSPITAL PRIMAVERA;Diretoria Técnica;HP - SCIH;2;JONAS RYTHOLZ;#CCCCCC;ativa
+148;HOSPITAL PRIMAVERA;Diretoria Técnica;HP - UNIDADES EXTERNAS;2;JONAS RYTHOLZ;#CCCCCC;ativa
+149;POLICLIN ITABAIANA;Diretoria Técnica;IT - Administracao;2;JONAS RYTHOLZ;#CCCCCC;ativa
+150;POLICLIN ITABAIANA;Diretoria Técnica;IT - Posto de Coleta Itabaiana;2;JONAS RYTHOLZ;#CCCCCC;ativa
+151;POLICLIN ITABAIANA;Diretoria Técnica;IT - Recepcao Pacientes;2;JONAS RYTHOLZ;#CCCCCC;ativa
+152;POLICLIN SIQUEIRA CAMPOS;Diretoria Técnica;SC - Administracao;2;JONAS RYTHOLZ;#CCCCCC;ativa
+153;POLICLIN SIQUEIRA CAMPOS;Diretoria Técnica;SC - Consultorios;2;JONAS RYTHOLZ;#CCCCCC;ativa
+154;POLICLIN SIQUEIRA CAMPOS;Diretoria Técnica;SC - Endoscopia Digestiva;2;JONAS RYTHOLZ;#CCCCCC;ativa
+155;POLICLIN SIQUEIRA CAMPOS;Diretoria Técnica;SC - Mamografia;2;JONAS RYTHOLZ;#CCCCCC;ativa
+156;POLICLIN SIQUEIRA CAMPOS;Diretoria Técnica;SC - Posto de Coleta Siqueira Campos;2;JONAS RYTHOLZ;#CCCCCC;ativa
+157;POLICLIN SIQUEIRA CAMPOS;Diretoria Técnica;SC - Raio X;2;JONAS RYTHOLZ;#CCCCCC;ativa
+158;POLICLIN SIQUEIRA CAMPOS;Diretoria Técnica;SC - Recepcao Pacientes;2;JONAS RYTHOLZ;#CCCCCC;ativa
+159;POLICLIN SIQUEIRA CAMPOS;Diretoria Técnica;SC - USG/Duplex/Ecocard./Puncao;2;JONAS RYTHOLZ;#CCCCCC;ativa
+160;HOSPITAL PRIMAVERA;Coordenação Jurídica;HP - Juridico;2;LARA EMANUELLE B MOREIRA NERY CASTRO;#CCCCCC;ativa
+161;HOSPITAL DO CORACAO;Diretoria Administrativa;HC - Administracao de Enfermagem;2;MARCOS VINICIO SACRAMENTO ROCHA;#CCCCCC;ativa
+162;HOSPITAL DO CORACAO;Diretoria Administrativa;HC - Auditoria;2;MARCOS VINICIO SACRAMENTO ROCHA;#CCCCCC;ativa
+163;HOSPITAL DO CORACAO;Diretoria Administrativa;HC - Consultorios;2;MARCOS VINICIO SACRAMENTO ROCHA;#CCCCCC;ativa
+164;HOSPITAL DO CORACAO;Diretoria Administrativa;HC - Diretoria;2;MARCOS VINICIO SACRAMENTO ROCHA;#CCCCCC;ativa
+165;HOSPITAL DO CORACAO;Diretoria Administrativa;HC - Estacionamento;2;MARCOS VINICIO SACRAMENTO ROCHA;#CCCCCC;ativa
+166;HOSPITAL DO CORACAO;Diretoria Administrativa;HC - Faturamento;2;MARCOS VINICIO SACRAMENTO ROCHA;#CCCCCC;ativa
+167;HOSPITAL DO CORACAO;Diretoria Administrativa;HC - Gerencia Administrativa;2;MARCOS VINICIO SACRAMENTO ROCHA;#CCCCCC;ativa
+168;HOSPITAL DO CORACAO;Diretoria Administrativa;HC - Nucleo de autorizações;2;MARCOS VINICIO SACRAMENTO ROCHA;#CCCCCC;ativa
+169;HOSPITAL DO CORACAO;Diretoria Administrativa;HC - OPME;2;MARCOS VINICIO SACRAMENTO ROCHA;#CCCCCC;ativa
+170;HOSPITAL DO CORACAO;Diretoria Administrativa;HC - Recepcao Principal;2;MARCOS VINICIO SACRAMENTO ROCHA;#CCCCCC;ativa
+171;HOSPITAL DO CORACAO;Diretoria Administrativa;HC - Recepção Unidade de Emergência;2;MARCOS VINICIO SACRAMENTO ROCHA;#CCCCCC;ativa
+172;HOSPITAL PRIMAVERA;Suprimentos;HP - Compras;2;MARCUS ROBERTO DE CASTRO MONTEIRO;#CCCCCC;ativa
+173;HOSPITAL PRIMAVERA;Suprimentos;HP - Nucleo de OPME;2;MARCUS ROBERTO DE CASTRO MONTEIRO;#CCCCCC;ativa
+174;HOSPITAL PRIMAVERA;Controladoria;HP - Controladoria;2;PAULO GERMANO DE ALMEIDA;#CCCCCC;ativa
+175;HOSPITAL PRIMAVERA;Coordenação de Processo e Performance;HP - Processos e Performance;2;THAIS CAMPOS DE JESUS;#CCCCCC;ativa
