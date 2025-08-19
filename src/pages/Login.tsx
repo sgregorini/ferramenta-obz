@@ -18,10 +18,10 @@ export default function Login({ setUsuario }: LoginProps) {
 
     // Validação na tabela funcionarios
     const { data, error } = await supabase
-      .from("funcionarios")
+      .from("usuarios")
       .select("*")
       .eq("email", email)
-      .eq("senha_hash", senha)
+      .eq("senha_hash", senha) // ajuste conforme o campo que usar
       .eq("flag_acesso_sistema", true)
       .eq("ativo", true)
       .single();

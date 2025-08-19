@@ -1,89 +1,89 @@
+// types.ts
 export interface Funcionario {
-  id: number;
+  id: string; // text
   nome: string;
   cargo: string;
-  responde_para?: number | null;
-  salario: number;
-  area_id: number;
-  carga_horaria: number;
-  regime: string;
-  email: string;
-  senha_hash: string;
-  ativo: boolean;
-  permissao?: "admin" | "preenchedor" | "visualizador";
-  flag_acesso_sistema?: boolean;
-  empresa?: string;
-  unidade_original?: string;
-  tipo_unidade?: string;
-  centro_custo?: string;
-  cargo_original?: string;
-  cargo_resumido?: string;
-  composicao_salarial?: string;
-  data_admissao?: string; // ou Date
-  salario_total?: number;
-  responsavel_centro_custo?: string;
-
-  // Calculado no frontend
-  possui_atividade?: boolean;
+  responde_para?: string | null; // text
+  salario: number | null;
+  area_id?: number | null; // integer
+  carga_horaria: number | null;
+  regime: string | null;
+  unidade?: string | null;
+  tipo_unidade?: string | null;
+  centro_custo?: string | null;
+  cargo_original?: string | null;
+  composicao_salarial?: string | null;
+  data_admissao?: string | null; // date
+  salario_total?: number | null;
+  responsavel_centro_custo?: boolean | null;
+  nivel_hierarquico?: number | null;
 }
 
 export interface Area {
-  id: number;
-  nome: string;
-  responsavel: string;
-  cor?: string;
-  unidade?: string;
-  status?: string;
-  responsavel_id: number
+  id: number; // integer
+  nome?: string | null;
+  responsavel?: string | null;
+  cor?: string | null;
+  status?: string | null; // default 'ativa'
+  responsavel_id?: string | null; // text
 }
-
 
 export interface Atividade {
-  id: number;
+  id: string; // UUID (public.atividades.id)
   nome: string;
-  tipo: string;
-  descricao?: string;
-  cliente?: string;
-  recursos_necessarios?: string;
-  area_id: number; // <-- Remova o `?`
+  descricao?: string | null;
+  tipo?: string | null;
+  cliente?: string | null;
+  recursos_necessarios?: string | null;
+  area_id?: number | null;
+  centro_custo?: string | null;
 }
 
+export interface Atividade_Modelo {
+  id: number; // integer
+  nome: string;
+  descricao?: string | null;
+  tipo?: string | null;
+  nivel_cargo?: string;
+  cliente?: string | null;
+  recursos_necessarios?: string | null;
+  criado_em?: string | null; // timestamptz
+}
 
+// OBS: a tabela distribuicao_percentual no seu schema tem id UUID,
+// funcionario_id TEXT, atividade_id UUID, e vários NUMERIC.
+// Deixo os tipos alinhados ao banco:
 export interface Distribuicao {
-  id: number;
-  funcionario_id: number;
-  atividade_id: number;
-  frequencia: string;
-  duracao_ocorrencia_horas: number;
-  quantidade_ocorrencias: number;
-  calculado_total_horas?: number;
-  complexidade?: number;
-  prioridade?: number;
-  gasto_estimado?: number;
-}
-
-
-export interface DistribuicaoSimulada {
-  id: number;
-  simulacao_nome: string;
-  area_id: number;
-  funcionario_id: number;
-  atividade_id: number;
-  percentual: number;
-  criado_em: string;
-}
-
-
-export interface SimulacaoResumo {
-  simulacao_nome: string;
+  id: string; // uuid
+  funcionario_id?: string | null; // text (UUID do funcionário salvo como text)
+  atividade_id?: string | null; // uuid
+  percentual?: number | null;
+  frequencia?: number | string | null; // pode ser numeric no banco; no app você usa labels
+  complexidade?: number | null;
+  prioridade?: number | null;
+  gasto_estimado?: number | null;
+  duracao_ocorrencia_horas?: number | null;
+  quantidade_ocorrencias?: number | null;
+  calculado_total_horas?: number | null;
 }
 
 export interface Usuario {
-  id: number;
-  nome: string;
+  id: string; // UUID (public.usuarios.id)
   email: string;
-  role?: string;
-  area_id?: number;
-  permissao: "admin" | "preenchedor" | "visualizador"; 
+  permissao: "admin" | "preenchedor" | "visualizador";
+  ativo: boolean;
+  flag_acesso_sistema?: boolean;
+  criado_em?: string; // timestamp
+  funcionario_id?: string | null; // text (UUID do funcionário como text)
+  senha_hash?: string | null;
+  nome?: string | null;
 }
 
+export interface ResponsavelCentroCusto {
+  id: string;
+  unidade: string | null;
+  centro_custo: string | null;
+  funcionario_id: string | null;
+  diretoria: string | null;
+  created_at?: string | null;
+}
