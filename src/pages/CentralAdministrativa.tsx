@@ -87,27 +87,28 @@ export default function CentralAdministrativa() {
     else fetchDados();
   };
 
-  const handleEditArea = async (id: string) => {
-    const a = areas.find((x) => x.id === id);
-    if (!a) return;
-    const nome = prompt("Editar nome da área:", a.nome ?? "");
-    if (nome === null) return;
-    const responsavel = prompt("Editar responsável:", a.responsavel ?? "");
-    if (responsavel === null) return;
-    const { error } = await supabase
-      .from("areas")
-      .update({ nome, responsavel })
-      .eq("id", id);
-    if (error) console.error("Erro ao editar área:", error);
-    else fetchDados();
-  };
+  const handleEditArea = async (id: number) => {
+  const a = areas.find((x) => x.id === id);
+  if (!a) return;
+  const nome = prompt("Editar nome da área:", a.nome ?? "");
+  if (nome === null) return;
+  const responsavel = prompt("Editar responsável:", a.responsavel ?? "");
+  if (responsavel === null) return;
+  const { error } = await supabase
+    .from("areas")
+    .update({ nome, responsavel })
+    .eq("id", id); // id é number mesmo
+  if (error) console.error("Erro ao editar área:", error);
+  else fetchDados();
+};
 
-  const handleDeleteArea = async (id: string) => {
-    if (!confirm("Tem certeza que deseja excluir esta área?")) return;
-    const { error } = await supabase.from("areas").delete().eq("id", id);
-    if (error) console.error("Erro ao excluir área:", error);
-    else fetchDados();
-  };
+  const handleDeleteArea = async (id: number) => {
+  if (!confirm("Tem certeza que deseja excluir esta área?")) return;
+  const { error } = await supabase.from("areas").delete().eq("id", id); // aqui id é number
+  if (error) console.error("Erro ao excluir área:", error);
+  else fetchDados();
+};
+
 
   // ---------------- ATIVIDADES ----------------
   const handleNewAtividade = async () => {
@@ -123,19 +124,19 @@ export default function CentralAdministrativa() {
   };
 
   const handleEditAtividade = async (id: string) => {
-    const atv = atividades.find((x) => x.id === id);
-    if (!atv) return;
-    const nome = prompt("Editar nome da atividade:", atv.nome);
-    if (nome === null) return;
-    const tipo = prompt("Editar tipo:", atv.tipo ?? "");
-    if (tipo === null) return;
-    const { error } = await supabase
-      .from("atividades")
-      .update({ nome, tipo })
-      .eq("id", id);
-    if (error) console.error("Erro ao editar atividade:", error);
-    else fetchDados();
-  };
+  const atv = atividades.find((x) => x.id === id);
+  if (!atv) return;
+  const nome = prompt("Editar nome da atividade:", atv.nome);
+  if (nome === null) return;
+  const tipo = prompt("Editar tipo:", atv.tipo ?? "");
+  if (tipo === null) return;
+  const { error } = await supabase
+    .from("atividades")
+    .update({ nome, tipo })
+    .eq("id", id); // aqui id é string (uuid)
+  if (error) console.error("Erro ao editar atividade:", error);
+  else fetchDados();
+};
 
   const handleDeleteAtividade = async (id: string) => {
     if (!confirm("Tem certeza que deseja excluir esta atividade?")) return;

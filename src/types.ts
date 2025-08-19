@@ -3,9 +3,9 @@ export interface Funcionario {
   id: string; // text
   nome: string;
   cargo: string;
-  responde_para?: string | null; // text
+  responde_para?: string | null;
   salario: number | null;
-  area_id?: number | null; // integer
+  area_id?: number | null;
   carga_horaria: number | null;
   regime: string | null;
   unidade?: string | null;
@@ -13,10 +13,10 @@ export interface Funcionario {
   centro_custo?: string | null;
   cargo_original?: string | null;
   composicao_salarial?: string | null;
-  data_admissao?: string | null; // date
+  data_admissao?: string | null;
   salario_total?: number | null;
-  responsavel_centro_custo?: boolean | null;
-  nivel_hierarquico?: number | null;
+  responsavel_centro_custo?: boolean | null; // no banco é numeric, mas melhor mapear como boolean
+  nivel_hierarquico?: string | null; // no banco é text, não number
 }
 
 export interface Area {
@@ -24,12 +24,12 @@ export interface Area {
   nome?: string | null;
   responsavel?: string | null;
   cor?: string | null;
-  status?: string | null; // default 'ativa'
-  responsavel_id?: string | null; // text
+  status?: string | null;
+  responsavel_id?: string | null;
 }
 
 export interface Atividade {
-  id: string; // UUID (public.atividades.id)
+  id: string; // uuid
   nome: string;
   descricao?: string | null;
   tipo?: string | null;
