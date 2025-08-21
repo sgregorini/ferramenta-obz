@@ -179,9 +179,9 @@ export default function CentralAdministrativa() {
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {funcionarios.map((f) => (
-                  <div
-                    key={f.id}
-                    className="border p-3 rounded-xl bg-white shadow-md hover:shadow-lg transition"
+                    <div
+                      key={`func-${f.id}`}
+                      className="border p-3 rounded-xl bg-white shadow-md hover:shadow-lg transition"
                   >
                     <p className="text-sm font-medium">
                       <strong>Nome:</strong> {f.nome ?? "-"}
@@ -224,9 +224,9 @@ export default function CentralAdministrativa() {
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {areas.map((a) => (
-                  <div
-                    key={a.id}
-                    className="border p-3 rounded-xl bg-white shadow-md hover:shadow-lg transition"
+                   <div
+                      key={`area-${a.id}`}
+                      className="border p-3 rounded-xl bg-white shadow-md hover:shadow-lg transition"
                   >
                     <p className="text-sm font-medium">
                       <strong>Nome:</strong> {a.nome}
@@ -273,7 +273,7 @@ export default function CentralAdministrativa() {
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {atividades.map((at) => (
                   <div
-                    key={at.id}
+                    key={`atv-${at.id}`}
                     className="border p-3 rounded-xl bg-white shadow-md hover:shadow-lg transition"
                   >
                     <p className="text-sm font-medium">

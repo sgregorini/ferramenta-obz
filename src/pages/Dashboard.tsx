@@ -19,78 +19,78 @@ export default function Dashboard({ usuario }: DashboardProps) {
   const [estruturaAbertaId, setEstruturaAbertaId] = useState<string | null>(null);
   const [centroCustoSelecionado, setCentroCustoSelecionado] = useState<string | null>(null);
   const [areaSelecionada, setAreaSelecionada] = useState<Area | undefined>(undefined);
+  const [unidadeSelecionada, setUnidadeSelecionada] = useState<string | null>(null); // ⬅️ Adicionado
   const [allowedFuncionarioIds, setAllowedFuncionarioIds] = useState<string[]>([]);
 
-useEffect(() => {
-  if (!usuario?.funcionario_id) return;
-  const carregarSubordinados = async () => {
-    const { data, error } = await supabase
-      .from("vw_subordinados_recursivos")
-      .select("id")
-      .eq("root_id", usuario.funcionario_id);
+  useEffect(() => {
+    if (!usuario?.funcionario_id) return;
+    const carregarSubordinados = async () => {
+      const { data, error } = await supabase
+        .from("vw_subordinados_recursivos")
+        .select("id")
+        .eq("root_id", usuario.funcionario_id);
 
-    if (error) {
-      console.error(error);
-      return;
-    }
-    setAllowedFuncionarioIds(data.map((d) => d.id));
-  };
-
-  carregarSubordinados();
-}, [usuario?.funcionario_id]);
-
-useEffect(() => {
-  const carregar = async () => {
-    const { data: funcionariosData } = await supabase.from("funcionarios").select("*");
-    const { data: areasData } = await supabase.from("areas").select("*");
-
-    if (funcionariosData) {
-      if (usuario?.permissao === "admin") {
-        // Admin visualiza tudo
-        setFuncionarios(funcionariosData);
-      } else {
-        // Filtra funcionários pelo allowedFuncionarioIds (próprio + subordinados)
-        setFuncionarios(funcionariosData.filter(f => allowedFuncionarioIds.includes(f.id)));
+      if (error) {
+        console.error(error);
+        return;
       }
-    }
+      setAllowedFuncionarioIds(data.map((d) => d.id));
+    };
 
-    setAreas(areasData || []);
-  };
-  carregar();
-}, [allowedFuncionarioIds, usuario?.permissao]);
+    carregarSubordinados();
+  }, [usuario?.funcionario_id]);
 
-const [responsaveisExtras, setResponsaveisExtras] = useState<Funcionario[]>([]);
+  useEffect(() => {
+    const carregar = async () => {
+      const { data: funcionariosData } = await supabase.from("funcionarios").select("*");
+      const { data: areasData } = await supabase.from("areas").select("*");
 
-useEffect(() => {
-  const carregarResponsaveisExtras = async () => {
-    if (areas.length === 0 || funcionarios.length === 0) return;
+      if (funcionariosData) {
+        if (usuario?.permissao === "admin") {
+          // Admin visualiza tudo
+          setFuncionarios(funcionariosData);
+        } else {
+          // Filtra funcionários pelo allowedFuncionarioIds (próprio + subordinados)
+          setFuncionarios(funcionariosData.filter(f => allowedFuncionarioIds.includes(f.id)));
+        }
+      }
 
-    const responsavelIdsFaltantes = areas
-      .filter(a => a.responsavel_id)
-      .map(a => a.responsavel_id as string)
-      .filter(id => !funcionarios.some(f => f.id === id));
+      setAreas(areasData || []);
+    };
+    carregar();
+  }, [allowedFuncionarioIds, usuario?.permissao]);
 
-    if (responsavelIdsFaltantes.length === 0) {
-      setResponsaveisExtras([]);
-      return;
-    }
+  const [responsaveisExtras, setResponsaveisExtras] = useState<Funcionario[]>([]);
 
-    const { data, error } = await supabase
-      .from('funcionarios')
-      .select('*')
-      .in('id', responsavelIdsFaltantes);
+  useEffect(() => {
+    const carregarResponsaveisExtras = async () => {
+      if (areas.length === 0 || funcionarios.length === 0) return;
 
-    if (error) {
-      console.error("Erro ao buscar responsáveis extras:", error);
-      setResponsaveisExtras([]);
-    } else {
-      setResponsaveisExtras(data as Funcionario[]);
-    }
-  };
+      const responsavelIdsFaltantes = areas
+        .filter(a => a.responsavel_id)
+        .map(a => a.responsavel_id as string)
+        .filter(id => !funcionarios.some(f => f.id === id));
 
-  carregarResponsaveisExtras();
-}, [areas, funcionarios]);
+      if (responsavelIdsFaltantes.length === 0) {
+        setResponsaveisExtras([]);
+        return;
+      }
 
+      const { data, error } = await supabase
+        .from('funcionarios')
+        .select('*')
+        .in('id', responsavelIdsFaltantes);
+
+      if (error) {
+        console.error("Erro ao buscar responsáveis extras:", error);
+        setResponsaveisExtras([]);
+      } else {
+        setResponsaveisExtras(data as Funcionario[]);
+      }
+    };
+
+    carregarResponsaveisExtras();
+  }, [areas, funcionarios]);
 
   const unidadesComCentros = Array.from(
     new Set(
@@ -127,30 +127,29 @@ useEffect(() => {
         const centrosPorDiretoria = new Map<string, Set<string>>();
         const diretoresMap = new Map<string, Funcionario>();
 
-      funcionarios
-        .filter((f) => f.unidade === hospital && f.centro_custo && f.centro_custo.trim() !== "")
-        .forEach((f) => {
-          const { area, responsavel } = rastrearDiretoria(f);
-          const nomeDiretoria = area?.nome ?? "Sem Diretoria";
+        funcionarios
+          .filter((f) => f.unidade === hospital && f.centro_custo && f.centro_custo.trim() !== "")
+          .forEach((f) => {
+            const { area, responsavel } = rastrearDiretoria(f);
+            const nomeDiretoria = area?.nome ?? "Sem Diretoria";
 
-          if (!centrosPorDiretoria.has(nomeDiretoria)) {
-            centrosPorDiretoria.set(nomeDiretoria, new Set());
+            if (!centrosPorDiretoria.has(nomeDiretoria)) {
+              centrosPorDiretoria.set(nomeDiretoria, new Set());
 
-            let responsavelFinal = responsavel;
-            if (!responsavelFinal && area?.responsavel_id) {
-              responsavelFinal =
-                funcionarios.find(f => f.id === area.responsavel_id) ??
-                responsaveisExtras.find(f => f.id === area.responsavel_id);
+              let responsavelFinal = responsavel;
+              if (!responsavelFinal && area?.responsavel_id) {
+                responsavelFinal =
+                  funcionarios.find(f => f.id === area.responsavel_id) ??
+                  responsaveisExtras.find(f => f.id === area.responsavel_id);
+              }
+
+              if (responsavelFinal) {
+                diretoresMap.set(nomeDiretoria, responsavelFinal);
+              }
             }
 
-            if (responsavelFinal) {
-              diretoresMap.set(nomeDiretoria, responsavelFinal);
-            }
-          }
-
-          centrosPorDiretoria.get(nomeDiretoria)!.add(f.centro_custo!);
-        });
-
+            centrosPorDiretoria.get(nomeDiretoria)!.add(f.centro_custo!);
+          });
 
         if (centrosPorDiretoria.size === 0) return null;
 
@@ -175,9 +174,9 @@ useEffect(() => {
                 <Card key={diretoria} className="mb-5 rounded-2xl border border-zinc-200 dark:border-zinc-700 shadow-sm hover:shadow-md transition-all bg-white dark:bg-zinc-900">
                   <div
                     className="flex justify-between items-center p-5 cursor-pointer"
-                onClick={() =>
-                  setExpandidos((prev) => ({ ...prev, [key]: !prev[key] }))
-                }
+                    onClick={() =>
+                      setExpandidos((prev) => ({ ...prev, [key]: !prev[key] }))
+                    }
                   >
                     <div>
                       <p className="font-semibold text-lg md:text-xl text-zinc-800 dark:text-white">{diretoria}</p>
@@ -188,19 +187,20 @@ useEffect(() => {
                         onClick={(e) => {
                           e.stopPropagation();
                           if (responsavel?.id) {
-                              setEstruturaAbertaId(responsavel.id);
+                            setEstruturaAbertaId(responsavel.id);
                           } else {
-                              // Busca a área pelo nome da diretoria para pegar o responsavel_id
-                              const areaCorrespondente = areas.find(a => a.nome === diretoria);
-                              if (areaCorrespondente?.responsavel_id) {
-                                  console.warn("Responsável da área não está nos subordinados, usando area.responsavel_id:", areaCorrespondente.responsavel_id);
-                                  setEstruturaAbertaId(areaCorrespondente.responsavel_id);
-                              } else {
-                                  console.warn("Responsável da área não encontrado e area.responsavel_id também não disponível para diretoria:", diretoria);
-                              }
+                            // Busca a área pelo nome da diretoria para pegar o responsavel_id
+                            const areaCorrespondente = areas.find(a => a.nome === diretoria);
+                            if (areaCorrespondente?.responsavel_id) {
+                              console.warn("Responsável da área não está nos subordinados, usando area.responsavel_id:", areaCorrespondente.responsavel_id);
+                              setEstruturaAbertaId(areaCorrespondente.responsavel_id);
+                            } else {
+                              console.warn("Responsável da área não encontrado e area.responsavel_id também não disponível para diretoria:", diretoria);
+                            }
                           }
                           setAreaSelecionada(undefined);
                           setCentroCustoSelecionado(null);
+                          setUnidadeSelecionada(null); // ⬅️ Adicionado
                         }}
                         className="p-1 rounded hover:bg-yellow-100 dark:hover:bg-yellow-600"
                       >
@@ -218,6 +218,10 @@ useEffect(() => {
                           className="p-4 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow bg-zinc-50 dark:bg-zinc-800 cursor-pointer hover:ring-2 hover:ring-yellow-300"
                           onClick={async () => {
                             setCentroCustoSelecionado(centro);
+                            setUnidadeSelecionada(hospital); // ⬅️ Adicionado
+                            const areaCorrespondente = areas.find(a => a.nome === diretoria);
+                            setAreaSelecionada(areaCorrespondente); // ⬅️ Adicionado
+
                             const { data: responsavelCentro } = await supabase
                               .from("responsaveis_centros_custo")
                               .select("funcionario_id")
@@ -256,10 +260,13 @@ useEffect(() => {
           onClose={() => {
             setEstruturaAbertaId(null);
             setCentroCustoSelecionado(null);
+            setUnidadeSelecionada(null); // ⬅️ Adicionado
+            setAreaSelecionada(undefined);
           }}
           filtroUnidade={!!areaSelecionada}
           areaFiltrada={areaSelecionada}
           centroCustoSelecionado={centroCustoSelecionado || undefined}
+          unidadeSelecionada={unidadeSelecionada || undefined} // ⬅️ Adicionado
         />
       )}
     </div>
