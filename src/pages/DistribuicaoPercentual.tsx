@@ -477,23 +477,26 @@ export default function DistribuicaoPercentual({ usuario }: { usuario: Usuario }
   /* ---- carregar ATIVIDADES do Supabase pela ÁREA (igual ao Cadastro) ---- */
   useEffect(() => {
     (async () => {
-      if (!areaIdNum) {
+      if (!areaIdNum || !centroCusto) {
         setAtividades([]);
         return;
       }
+
+      // importante: filtrar por area_id + centro_custo no servidor (alinha com o Cadastro)
       const { data, error } = await supabase
         .from("atividades")
         .select("*")
-        .eq("area_id", areaIdNum);
+        .eq("area_id", areaIdNum)
+        .eq("centro_custo", centroCusto.trim()); // trim por segurança
 
       if (error) {
-        console.error("Erro ao carregar atividades por área:", error);
+        console.error("Erro ao carregar atividades por área/CC:", error);
         setAtividades([]);
         return;
       }
       setAtividades((data || []) as Atividade[]);
     })();
-  }, [areaIdNum]);
+  }, [areaIdNum, centroCusto]);
 
   /* ---- filtros ---- */
   const unidades = useMemo(
