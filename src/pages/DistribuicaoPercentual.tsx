@@ -78,6 +78,9 @@ const sumHoras = (it: DistribuicaoPorAtividade[]) =>
 const cls = (...a: (string | false | undefined)[]) =>
   a.filter(Boolean).join(" ");
 
+// normaliza strings para comparação robusta (sem espaços/caixa)
+const norm = (s?: string | null) => (s ?? "").trim().toLowerCase();
+
 function HelpTip({
   title,
   children,
@@ -394,7 +397,7 @@ export default function DistribuicaoPercentual({ usuario }: { usuario: Usuario }
 
   const [areas, setAreas] = useState<Area[]>([]);
   const [funcionarios, setFuncionarios] = useState<Funcionario[]>([]);
-  const [atividades, setAtividades] = useState<Atividade[]>([]);
+  const [atividades, setAtividades] = useState<Atividade[]>([]); // carregadas do Supabase por área
   const [distribuicoes, setDistribuicoes] = useState<Distribuicoes>({});
   const [centrosCustoDisponiveis, setCentrosCustoDisponiveis] = useState<string[]>(
     []
@@ -403,7 +406,7 @@ export default function DistribuicaoPercentual({ usuario }: { usuario: Usuario }
 
   const [selecionadoId, setSelecionadoId] = useState<string | null>(null);
   const [selecionados, setSelecionados] = useState<string[]>([]);
-  const [queryColab, setQueryColab] = useState(""); // (mantido caso queira reexibir busca)
+  const [queryColab, setQueryColab] = useState("");
 
   const [dirtyIds, setDirtyIds] = useState<Set<string>>(new Set());
   const [saving, setSaving] = useState(false);
@@ -412,6 +415,12 @@ export default function DistribuicaoPercentual({ usuario }: { usuario: Usuario }
   const [somenteDoCC, setSomenteDoCC] = useState(false);
 
   const [cargosSelecionados, setCargosSelecionados] = useState<string[]>([]);
+
+  // areaId como número (evita bug de comparação string vs number)
+  const areaIdNum = useMemo(() => {
+    const n = Number(areaId);
+    return Number.isFinite(n) ? n : null;
+  }, [areaId]);
 
   /* ---- escopo do usuário ---- */
   useEffect(() => {
@@ -429,12 +438,11 @@ export default function DistribuicaoPercentual({ usuario }: { usuario: Usuario }
     })();
   }, [usuario?.funcionario_id, isAdmin]);
 
-  /* ---- carga inicial ---- */
+  /* ---- carga inicial (sem atividades; serão buscadas por área) ---- */
   useEffect(() => {
     (async () => {
       let areasAPI = await adapterSupabase.getAreas();
       let funcionariosAPI = await adapterSupabase.getFuncionarios();
-      let atividadesAPI = await adapterSupabase.getAtividades();
       const distribuicoesReais = await adapterSupabase.getDistribuicaoReal();
 
       if (!isAdmin) {
@@ -446,9 +454,6 @@ export default function DistribuicaoPercentual({ usuario }: { usuario: Usuario }
           .map((f: Funcionario) => f.area_id)
           .filter((v: any): v is number => !!v);
         areasAPI = areasAPI.filter((a: Area) => areaIds.includes(a.id));
-        atividadesAPI = atividadesAPI.filter(
-          (a: Atividade) => a.area_id != null && areaIds.includes(a.area_id as number)
-        );
       }
 
       const map: Distribuicoes = {};
@@ -465,10 +470,30 @@ export default function DistribuicaoPercentual({ usuario }: { usuario: Usuario }
 
       setAreas(areasAPI);
       setFuncionarios(funcionariosAPI);
-      setAtividades(atividadesAPI);
       setDistribuicoes(map);
     })();
   }, [allowedFuncionarioIds, isAdmin]);
+
+  /* ---- carregar ATIVIDADES do Supabase pela ÁREA (igual ao Cadastro) ---- */
+  useEffect(() => {
+    (async () => {
+      if (!areaIdNum) {
+        setAtividades([]);
+        return;
+      }
+      const { data, error } = await supabase
+        .from("atividades")
+        .select("*")
+        .eq("area_id", areaIdNum);
+
+      if (error) {
+        console.error("Erro ao carregar atividades por área:", error);
+        setAtividades([]);
+        return;
+      }
+      setAtividades((data || []) as Atividade[]);
+    })();
+  }, [areaIdNum]);
 
   /* ---- filtros ---- */
   const unidades = useMemo(
@@ -488,13 +513,13 @@ export default function DistribuicaoPercentual({ usuario }: { usuario: Usuario }
   );
 
   useEffect(() => {
-    if (!unidade || !areaId) {
+    if (!unidade || !areaIdNum) {
       setCentrosCustoDisponiveis([]);
       setCentroCusto("");
       return;
     }
     const lista = funcionarios
-      .filter((f) => f.unidade === unidade && String(f.area_id) === areaId)
+      .filter((f) => f.unidade === unidade && f.area_id === areaIdNum)
       .map((f) => f.centro_custo)
       .filter((cc): cc is string => !!cc);
     setCentrosCustoDisponiveis(Array.from(new Set(lista)).sort());
@@ -504,13 +529,13 @@ export default function DistribuicaoPercentual({ usuario }: { usuario: Usuario }
         (f) =>
           f.id === usuario.funcionario_id &&
           f.unidade === unidade &&
-          String(f.area_id) === areaId
+          f.area_id === areaIdNum
       )?.centro_custo;
       if (meu) setCentroCusto(meu);
     }
-  }, [funcionarios, unidade, areaId, isAdmin]); // eslint-disable-line
+  }, [funcionarios, unidade, areaIdNum, isAdmin]); // eslint-disable-line
 
-  const filtrosOk = !!unidade && !!areaId && !!centroCusto;
+  const filtrosOk = !!unidade && !!areaIdNum && !!centroCusto;
 
   const cargosDisponiveis = useMemo(() => {
     if (!filtrosOk) return [];
@@ -519,14 +544,14 @@ export default function DistribuicaoPercentual({ usuario }: { usuario: Usuario }
         .filter(
           (f) =>
             f.unidade === unidade &&
-            String(f.area_id) === areaId &&
+            f.area_id === areaIdNum &&
             f.centro_custo === centroCusto
         )
         .map((f) => f.cargo?.trim())
         .filter(Boolean) as string[]
     );
     return Array.from(set).sort((a, b) => a.localeCompare(b));
-  }, [funcionarios, filtrosOk, unidade, areaId, centroCusto]);
+  }, [funcionarios, filtrosOk, unidade, areaIdNum, centroCusto]);
 
   /* ---- colaboradores (inclui cargos) ---- */
   const colaboradores = useMemo(() => {
@@ -534,7 +559,7 @@ export default function DistribuicaoPercentual({ usuario }: { usuario: Usuario }
     let lista = funcionarios.filter(
       (f) =>
         f.unidade === unidade &&
-        String(f.area_id) === areaId &&
+        f.area_id === areaIdNum &&
         f.centro_custo === centroCusto
     );
 
@@ -552,7 +577,7 @@ export default function DistribuicaoPercentual({ usuario }: { usuario: Usuario }
     funcionarios,
     filtrosOk,
     unidade,
-    areaId,
+    areaIdNum,
     centroCusto,
     queryColab,
     cargosSelecionados,
@@ -568,20 +593,25 @@ export default function DistribuicaoPercentual({ usuario }: { usuario: Usuario }
     return set;
   }, [fidsCC, distribuicoes]);
 
+  // *** AQUI É A CHAVE: mesmas regras do cadastro + normalização do CC ***
   const atividadesCombo = useMemo(() => {
-    if (!filtrosOk) return [] as Atividade[];
+    if (!filtrosOk || !areaIdNum) return [] as Atividade[];
 
-    const base = atividades.filter(
-      (a) =>
-        String(a.area_id || "") === areaId &&
-        (a.centro_custo == null || a.centro_custo === centroCusto)
-    );
+    const sel = norm(centroCusto);
+
+    // Base = todas as atividades da ÁREA (carregadas do Supabase)
+    // Filtro final = centro_custo normalizado igual ao CC selecionado
+    const base = atividades.filter((a) => {
+      const sameArea = Number(a.area_id) === areaIdNum;
+      const cc = norm((a as any).centro_custo);
+      return sameArea && cc === sel;
+    });
 
     if (!somenteDoCC) return base;
 
     const usadas = base.filter((a) => atividadeIdsUsadasNoCC.has(String(a.id)));
     return usadas.length ? usadas : base;
-  }, [atividades, filtrosOk, areaId, centroCusto, somenteDoCC, atividadeIdsUsadasNoCC]);
+  }, [atividades, filtrosOk, areaIdNum, centroCusto, somenteDoCC, atividadeIdsUsadasNoCC]);
 
   const selecionado = useMemo(
     () => colaboradores.find((f) => f.id === selecionadoId) || null,
