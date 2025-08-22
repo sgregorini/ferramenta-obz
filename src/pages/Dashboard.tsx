@@ -280,9 +280,14 @@ export default function Dashboard({ usuario }: DashboardProps) {
                               .maybeSingle();
 
                             if (respCC?.funcionario_id) {
-                              setEstruturaAbertaId(respCC.funcionario_id);
-                              return;
-                            }
+                            // passa direto o responsável do CC como raiz do drawer
+                            setEstruturaAbertaId(respCC.funcionario_id);
+                            setCentroCustoSelecionado(centro);
+                            setUnidadeSelecionada(hospital);
+                            setAreaSelecionada(areas.find((a) => a.nome === diretoria));
+                            return;
+                          }
+
 
                             // fallback: pega alguém do centro e sobe até diretoria
                             const algum = todosFuncionarios.find(
