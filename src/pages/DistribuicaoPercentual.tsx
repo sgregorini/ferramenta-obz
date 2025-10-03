@@ -31,11 +31,13 @@ import {
   Sparkles,
   Info,
   TriangleAlert,
+  FileDown,
   ChevronsUpDown,
 } from "lucide-react";
 import { toast } from "sonner";
+import * as XLSX from "xlsx";
 
-/* ========= Tipos locais ========= */
+/* ========= Tipos e Constantes ========= */
 type Frequencia =
   | "Diária"
   | "Semanal"
@@ -77,6 +79,9 @@ const sumHoras = (it: DistribuicaoPorAtividade[]) =>
 
 const cls = (...a: (string | false | undefined)[]) =>
   a.filter(Boolean).join(" ");
+
+// normaliza strings para comparação robusta (sem espaços/caixa)
+const norm = (s?: string | null) => (s ?? "").trim().toLowerCase();
 
 function HelpTip({
   title,
@@ -125,6 +130,7 @@ const linhaValida = (d: {
 const sanitizeDistribuicoes = (arr: any[]) =>
   (Array.isArray(arr) ? arr : []).filter(linhaValida);
 
+/** ✅ LinhaAtividade: agora sem setState no pai durante o render */
 const LinhaAtividade = memo(function LinhaAtividade({
   atividadeNome,
   cargaMensal,
@@ -144,9 +150,11 @@ const LinhaAtividade = memo(function LinhaAtividade({
   }) => void;
 }) {
   const [draft, setDraft] = useState<LinhaValue>(initial);
+  const shouldCommitRef = useRef(false);
 
   useEffect(() => {
     setDraft(initial);
+    // não commitar aqui: evita setState no pai durante render/mount
   }, [
     initial.atividade_id,
     initial.duracao_ocorrencia_horas,
@@ -168,13 +176,21 @@ const LinhaAtividade = memo(function LinhaAtividade({
     ((Number(draft.duracao_ocorrencia_horas) || 0) <= 0 ||
       (Number(draft.quantidade_ocorrencias) || 0) <= 0);
 
-  const normalizeAndCommit = useCallback(() => {
+  // marca que deve commitar; o commit real acontece no useEffect abaixo
+  const markShouldCommit = useCallback(() => {
+    shouldCommitRef.current = true;
+  }, []);
+
+  // ✅ Commit pós-render: normaliza e chama o onCommit fora do ciclo de render
+  useEffect(() => {
+    if (!shouldCommitRef.current) return;
+    shouldCommitRef.current = false;
+
     const dur = Math.max(0, Number(draft.duracao_ocorrencia_horas) || 0);
     const occ = Math.max(0, Number(draft.quantidade_ocorrencias) || 0);
     let freq = (draft.frequencia || "") as Frequencia | "";
 
     if (freq && (dur <= 0 || occ <= 0)) freq = "";
-    if (dur <= 0 || occ <= 0) freq = "";
 
     onCommit({
       atividade_id: String(draft.atividade_id),
@@ -182,7 +198,14 @@ const LinhaAtividade = memo(function LinhaAtividade({
       quantidade_ocorrencias: occ,
       frequencia: freq,
     });
-  }, [draft, onCommit]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    draft.duracao_ocorrencia_horas,
+    draft.quantidade_ocorrencias,
+    draft.frequencia,
+    draft.atividade_id,
+    onCommit,
+  ]);
 
   return (
     <div className="grid grid-cols-12 items-center px-3 py-2 border-t text-sm">
@@ -210,9 +233,11 @@ const LinhaAtividade = memo(function LinhaAtividade({
           onChange={(e) =>
             setDraft((d) => ({ ...d, duracao_ocorrencia_horas: e.target.value }))
           }
-          onBlur={normalizeAndCommit}
+          onBlur={markShouldCommit}
           onKeyDown={(e) => {
-            if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+            if (e.key === "Enter") {
+              (e.target as HTMLInputElement).blur(); // dispara onBlur -> markShouldCommit
+            }
           }}
         />
       </div>
@@ -226,9 +251,11 @@ const LinhaAtividade = memo(function LinhaAtividade({
           onChange={(e) =>
             setDraft((d) => ({ ...d, quantidade_ocorrencias: e.target.value }))
           }
-          onBlur={normalizeAndCommit}
+          onBlur={markShouldCommit}
           onKeyDown={(e) => {
-            if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+            if (e.key === "Enter") {
+              (e.target as HTMLInputElement).blur();
+            }
           }}
         />
       </div>
@@ -237,22 +264,8 @@ const LinhaAtividade = memo(function LinhaAtividade({
         <Select
           value={draft.frequencia || ""}
           onValueChange={(v) => {
-            setDraft((prev) => {
-              const next = { ...prev, frequencia: v as Frequencia };
-              onCommit({
-                atividade_id: String(next.atividade_id),
-                duracao_ocorrencia_horas: Math.max(
-                  0,
-                  Number(next.duracao_ocorrencia_horas) || 0
-                ),
-                quantidade_ocorrencias: Math.max(
-                  0,
-                  Number(next.quantidade_ocorrencias) || 0
-                ),
-                frequencia: next.frequencia || "",
-              });
-              return next;
-            });
+            setDraft((prev) => ({ ...prev, frequencia: v as Frequencia }));
+            markShouldCommit();
           }}
         >
           <SelectTrigger>
@@ -394,7 +407,7 @@ export default function DistribuicaoPercentual({ usuario }: { usuario: Usuario }
 
   const [areas, setAreas] = useState<Area[]>([]);
   const [funcionarios, setFuncionarios] = useState<Funcionario[]>([]);
-  const [atividades, setAtividades] = useState<Atividade[]>([]);
+  const [atividades, setAtividades] = useState<Atividade[]>([]); // carregadas do Supabase por área
   const [distribuicoes, setDistribuicoes] = useState<Distribuicoes>({});
   const [centrosCustoDisponiveis, setCentrosCustoDisponiveis] = useState<string[]>(
     []
@@ -403,7 +416,7 @@ export default function DistribuicaoPercentual({ usuario }: { usuario: Usuario }
 
   const [selecionadoId, setSelecionadoId] = useState<string | null>(null);
   const [selecionados, setSelecionados] = useState<string[]>([]);
-  const [queryColab, setQueryColab] = useState(""); // (mantido caso queira reexibir busca)
+  const [queryColab, setQueryColab] = useState("");
 
   const [dirtyIds, setDirtyIds] = useState<Set<string>>(new Set());
   const [saving, setSaving] = useState(false);
@@ -412,6 +425,12 @@ export default function DistribuicaoPercentual({ usuario }: { usuario: Usuario }
   const [somenteDoCC, setSomenteDoCC] = useState(false);
 
   const [cargosSelecionados, setCargosSelecionados] = useState<string[]>([]);
+
+  // areaId como número (evita bug de comparação string vs number)
+  const areaIdNum = useMemo(() => {
+    const n = Number(areaId);
+    return Number.isFinite(n) ? n : null;
+  }, [areaId]);
 
   /* ---- escopo do usuário ---- */
   useEffect(() => {
@@ -429,12 +448,11 @@ export default function DistribuicaoPercentual({ usuario }: { usuario: Usuario }
     })();
   }, [usuario?.funcionario_id, isAdmin]);
 
-  /* ---- carga inicial ---- */
+  /* ---- carga inicial (sem atividades; serão buscadas por área) ---- */
   useEffect(() => {
     (async () => {
       let areasAPI = await adapterSupabase.getAreas();
       let funcionariosAPI = await adapterSupabase.getFuncionarios();
-      let atividadesAPI = await adapterSupabase.getAtividades();
       const distribuicoesReais = await adapterSupabase.getDistribuicaoReal();
 
       if (!isAdmin) {
@@ -446,29 +464,49 @@ export default function DistribuicaoPercentual({ usuario }: { usuario: Usuario }
           .map((f: Funcionario) => f.area_id)
           .filter((v: any): v is number => !!v);
         areasAPI = areasAPI.filter((a: Area) => areaIds.includes(a.id));
-        atividadesAPI = atividadesAPI.filter(
-          (a: Atividade) => a.area_id != null && areaIds.includes(a.area_id as number)
-        );
       }
 
       const map: Distribuicoes = {};
       (distribuicoesReais || []).forEach((d: any) => {
-        const fid = d.funcionario_id ? String(d.funcionario_id) : undefined;
-        if (!fid) return;
+        const fid = String(d.funcionario_id ?? "").trim();
+        const aid = String(d.atividade_id ?? "").trim();
+        if (!fid || !aid) return;
         (map[fid] ||= []).push({
-          atividade_id: String(d.atividade_id ?? ""),
+          atividade_id: aid,
           frequencia: (d.frequencia ?? "") as Frequencia,
           duracao_ocorrencia_horas: Number(d.duracao_ocorrencia_horas ?? 0),
           quantidade_ocorrencias: Number(d.quantidade_ocorrencias ?? 0),
         });
       });
-
       setAreas(areasAPI);
       setFuncionarios(funcionariosAPI);
-      setAtividades(atividadesAPI);
       setDistribuicoes(map);
     })();
   }, [allowedFuncionarioIds, isAdmin]);
+
+  /* ---- carregar ATIVIDADES do Supabase pela ÁREA (igual ao Cadastro) ---- */
+  useEffect(() => {
+    (async () => {
+      if (!areaIdNum || !centroCusto) {
+        setAtividades([]);
+        return;
+      }
+
+      // importante: filtrar por area_id + centro_custo no servidor (alinha com o Cadastro)
+      const { data, error } = await supabase
+        .from("atividades")
+        .select("*")
+        .eq("area_id", areaIdNum)
+        .eq("centro_custo", centroCusto.trim()); // trim por segurança
+
+      if (error) {
+        console.error("Erro ao carregar atividades por área/CC:", error);
+        setAtividades([]);
+        return;
+      }
+      setAtividades((data || []) as Atividade[]);
+    })();
+  }, [areaIdNum, centroCusto]);
 
   /* ---- filtros ---- */
   const unidades = useMemo(
@@ -488,13 +526,13 @@ export default function DistribuicaoPercentual({ usuario }: { usuario: Usuario }
   );
 
   useEffect(() => {
-    if (!unidade || !areaId) {
+    if (!unidade || !areaIdNum) {
       setCentrosCustoDisponiveis([]);
       setCentroCusto("");
       return;
     }
     const lista = funcionarios
-      .filter((f) => f.unidade === unidade && String(f.area_id) === areaId)
+      .filter((f) => f.unidade === unidade && f.area_id === areaIdNum)
       .map((f) => f.centro_custo)
       .filter((cc): cc is string => !!cc);
     setCentrosCustoDisponiveis(Array.from(new Set(lista)).sort());
@@ -504,13 +542,13 @@ export default function DistribuicaoPercentual({ usuario }: { usuario: Usuario }
         (f) =>
           f.id === usuario.funcionario_id &&
           f.unidade === unidade &&
-          String(f.area_id) === areaId
+          f.area_id === areaIdNum
       )?.centro_custo;
       if (meu) setCentroCusto(meu);
     }
-  }, [funcionarios, unidade, areaId, isAdmin]); // eslint-disable-line
+  }, [funcionarios, unidade, areaIdNum, isAdmin]); // eslint-disable-line
 
-  const filtrosOk = !!unidade && !!areaId && !!centroCusto;
+  const filtrosOk = !!unidade && !!areaIdNum && !!centroCusto;
 
   const cargosDisponiveis = useMemo(() => {
     if (!filtrosOk) return [];
@@ -519,14 +557,14 @@ export default function DistribuicaoPercentual({ usuario }: { usuario: Usuario }
         .filter(
           (f) =>
             f.unidade === unidade &&
-            String(f.area_id) === areaId &&
+            f.area_id === areaIdNum &&
             f.centro_custo === centroCusto
         )
         .map((f) => f.cargo?.trim())
         .filter(Boolean) as string[]
     );
     return Array.from(set).sort((a, b) => a.localeCompare(b));
-  }, [funcionarios, filtrosOk, unidade, areaId, centroCusto]);
+  }, [funcionarios, filtrosOk, unidade, areaIdNum, centroCusto]);
 
   /* ---- colaboradores (inclui cargos) ---- */
   const colaboradores = useMemo(() => {
@@ -534,7 +572,7 @@ export default function DistribuicaoPercentual({ usuario }: { usuario: Usuario }
     let lista = funcionarios.filter(
       (f) =>
         f.unidade === unidade &&
-        String(f.area_id) === areaId &&
+        f.area_id === areaIdNum &&
         f.centro_custo === centroCusto
     );
 
@@ -552,7 +590,7 @@ export default function DistribuicaoPercentual({ usuario }: { usuario: Usuario }
     funcionarios,
     filtrosOk,
     unidade,
-    areaId,
+    areaIdNum,
     centroCusto,
     queryColab,
     cargosSelecionados,
@@ -568,20 +606,25 @@ export default function DistribuicaoPercentual({ usuario }: { usuario: Usuario }
     return set;
   }, [fidsCC, distribuicoes]);
 
+  // *** AQUI É A CHAVE: mesmas regras do cadastro + normalização do CC ***
   const atividadesCombo = useMemo(() => {
-    if (!filtrosOk) return [] as Atividade[];
+    if (!filtrosOk || !areaIdNum) return [] as Atividade[];
 
-    const base = atividades.filter(
-      (a) =>
-        String(a.area_id || "") === areaId &&
-        (a.centro_custo == null || a.centro_custo === centroCusto)
-    );
+    const sel = norm(centroCusto);
+
+    // Base = todas as atividades da ÁREA (carregadas do Supabase)
+    // Filtro final = centro_custo normalizado igual ao CC selecionado
+    const base = atividades.filter((a) => {
+      const sameArea = Number(a.area_id) === areaIdNum;
+      const cc = norm((a as any).centro_custo);
+      return sameArea && cc === sel;
+    });
 
     if (!somenteDoCC) return base;
 
     const usadas = base.filter((a) => atividadeIdsUsadasNoCC.has(String(a.id)));
     return usadas.length ? usadas : base;
-  }, [atividades, filtrosOk, areaId, centroCusto, somenteDoCC, atividadeIdsUsadasNoCC]);
+  }, [atividades, filtrosOk, areaIdNum, centroCusto, somenteDoCC, atividadeIdsUsadasNoCC]);
 
   const selecionado = useMemo(
     () => colaboradores.find((f) => f.id === selecionadoId) || null,
@@ -786,6 +829,44 @@ export default function DistribuicaoPercentual({ usuario }: { usuario: Usuario }
     }
   };
 
+  const handleExport = async () => {
+    if (colaboradores.length === 0) {
+      toast.info("Nenhum colaborador para exportar com os filtros atuais.");
+      return;
+    }
+
+    setSaving(true); // Reutilizando o estado de 'saving'
+    toast.info("Gerando arquivo XLSX...");
+
+    try {
+      const dataToExport = [];
+      for (const func of colaboradores) {
+        const dists = sanitizeDistribuicoes(distribuicoes[func.id] || []);
+        for (const dist of dists) {
+          const atividade = atividades.find(a => a.id === dist.atividade_id);
+            dataToExport.push({
+              "Funcionário ID": func.id,
+              "Funcionário Nome": func.nome,
+              "Cargo": func.cargo,
+              "Atividade Nome": atividade?.nome || `ID: ${dist.atividade_id}`,
+              "Horas/Ocorrência": dist.duracao_ocorrencia_horas,
+              "Ocorrências/Mês": dist.quantidade_ocorrencias,
+              "Frequência": dist.frequencia,
+              "Total Horas/Mês": dist.duracao_ocorrencia_horas * dist.quantidade_ocorrencias,
+            });
+          }
+      }
+
+      const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Distribuicoes");
+      XLSX.writeFile(workbook, `Distribuicao_${centroCusto.replace(/\s/g, "_")}.xlsx`);
+      toast.success("Arquivo gerado com sucesso!");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   /* ---- resumo do selecionado ---- */
   const horasSel = selecionado ? sumHoras(distribuicoes[selecionado.id] || []) : 0;
   const cargaSel = selecionado?.carga_horaria || 0;
@@ -921,6 +1002,19 @@ export default function DistribuicaoPercentual({ usuario }: { usuario: Usuario }
                 ))}
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="md:col-span-3">
+            <Label className="opacity-0 select-none">.</Label> {/* Espaçador para alinhar */}
+            <Button
+              variant="outline"
+              onClick={handleExport}
+              disabled={colaboradores.length === 0 || saving}
+              className="text-blue-600 border-blue-600 hover:bg-blue-50 hover:text-blue-700 dark:text-blue-400 dark:border-blue-400 dark:hover:bg-blue-900/20 dark:hover:text-blue-300"
+            >
+              <FileDown className="h-4 w-4 mr-2" />
+              {saving ? "Exportando..." : "Exportar Distribuições"}
+            </Button>
           </div>
 
           <div className="md:col-span-6">
@@ -1098,8 +1192,8 @@ export default function DistribuicaoPercentual({ usuario }: { usuario: Usuario }
 
                       <Button
                         onClick={salvarAlteracoes}
-                        disabled={!podeSalvar}
-                        className="bg-yellow-500 text-black hover:brightness-110"
+                        disabled={!podeSalvar || saving}
+                        className="bg-yellow-500 text-black hover:bg-yellow-400 disabled:opacity-50"
                       >
                         {saving ? "Salvando..." : "Salvar alterações"}
                       </Button>

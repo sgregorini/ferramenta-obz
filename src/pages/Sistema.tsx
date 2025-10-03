@@ -10,6 +10,7 @@ import Configuracoes from "./Configuracoes";
 import DistribuicaoPercentual from "./DistribuicaoPercentual";
 import WorkeforcePlanning from "./WorkforcePlanning";
 import CentralAdministrativa from "./CentralAdministrativa";
+import GestaoAtividades from "./GestaoAtividades";
 import Login from "./Login";
 
 import { Usuario } from "../types";
@@ -36,7 +37,6 @@ export default function Sistema({ usuario, darkMode, setDarkMode }: SistemaProps
     navigate("/login");
   };
 
-
   return (
     <div className="flex h-screen flex-col">
       {/* ✅ Barra superior amarela */}
@@ -51,7 +51,6 @@ export default function Sistema({ usuario, darkMode, setDarkMode }: SistemaProps
           Sair
         </button>
       </header>
-
 
       {/* ✅ Conteúdo com sidebar e rotas */}
       <div className="flex flex-1 overflow-hidden">
@@ -68,6 +67,14 @@ export default function Sistema({ usuario, darkMode, setDarkMode }: SistemaProps
                 />
               }
             />
+
+
+            {(isAdmin || isPreenchedor) && (
+              <Route
+                path="/gestao-atividades"
+                element={<GestaoAtividades usuario={usuario} />}
+              />
+            )}
 
             {(isAdmin || isPreenchedor) && (
               <Route
@@ -86,12 +93,13 @@ export default function Sistema({ usuario, darkMode, setDarkMode }: SistemaProps
             )}
 
             {(isAdmin || isPreenchedor) && (
-              <Route path="/distribuicao-percentual" 
-              element={<DistribuicaoPercentual usuario={usuario} />} />
+              <Route
+                path="/distribuicao-percentual"
+                element={<DistribuicaoPercentual usuario={usuario} />}
+              />
             )}
 
             <Route path="/login" element={<Login setUsuario={() => {}} />} />
-
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>

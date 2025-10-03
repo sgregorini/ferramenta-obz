@@ -8,6 +8,7 @@ import {
   Moon,
   Sun,
   SlidersHorizontal,
+  ClipboardList,
 } from "lucide-react";
 
 import { Usuario } from "../types";
@@ -24,12 +25,13 @@ export default function Sidebar({ darkMode, setDarkMode, usuario }: SidebarProps
   const isPreenchedor = usuario.permissao === "preenchedor";
 
   const menu = [
-    { label: "Gestão de Estrutura",      icon: <Home size={18} />,               path: "/sistema",                       permitido: true },
-    { label: "Cadastro de Atividades",    icon: <ListTodo size={18} />,           path: "/sistema/cadastro-atividades",   permitido: isAdmin || isPreenchedor },
-    { label: "Distribuição Percentual",   icon: <SlidersHorizontal size={18} />,  path: "/sistema/distribuicao-percentual",permitido: isAdmin || isPreenchedor },
-    { label: "Análises",                  icon: <BarChart size={18} />,           path: "/sistema/analises",              permitido: isAdmin },
-    { label: "Workforce Planning",        icon: <UserCog size={18} />,            path: "/sistema/workforce-planning",    permitido: isAdmin },
-    { label: "Central Administrativa",    icon: <ShieldCheck size={18} />,        path: "/sistema/central-administrativa",permitido: isAdmin },
+    {label: "Gestão de Estrutura", icon: <Home size={18} />, path: "/sistema", permitido: true},
+    {label: "Gestão de Atividades", icon: <ClipboardList size={18} />, path: "/sistema/gestao-atividades", permitido: isAdmin || isPreenchedor},
+    {label: "Cadastro de Atividades", icon: <ListTodo size={18} />, path: "/sistema/cadastro-atividades", permitido: isAdmin || isPreenchedor },
+    {label: "Distribuição Percentual", icon: <SlidersHorizontal size={18} />, path: "/sistema/distribuicao-percentual",permitido: isAdmin || isPreenchedor},
+    {label: "Análises", icon: <BarChart size={18} />, path: "/sistema/analises", permitido: isAdmin},
+    {label: "Workforce Planning", icon: <UserCog size={18} />, path: "/sistema/workforce-planning", permitido: isAdmin},
+    {label: "Central Administrativa", icon: <ShieldCheck size={18} />, path: "/sistema/central-administrativa", permitido: isAdmin},
   ];
 
   return (

@@ -5,20 +5,47 @@ import {
   TabsTrigger,
   TabsContent,
 } from "@/components/ui/tabs";
+import { DialogTitle as DrawerTitle, DialogDescription as DrawerDescription } from "@radix-ui/react-dialog";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+import * as XLSX from "xlsx";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2, PlusCircle, ShieldCheck } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import { Pencil, Trash2, PlusCircle, ShieldCheck, FileDown, ChevronsUpDown, Check } from "lucide-react";
 
 import { supabase } from "../lib/supabase";
-import { Funcionario, Area, Atividade } from "../types";
+import { adapterSupabase } from "../adapters/adapterSupabase";
+import { toast } from "sonner";
+import { Funcionario, Area, Atividade, Distribuicao, Usuario } from "../types";
 
 export default function CentralAdministrativa() {
-  const [aba, setAba] = useState<"funcionarios" | "areas" | "atividades">(
+  const [aba, setAba] = useState<"usuarios" | "funcionarios" | "areas" | "atividades">(
     "funcionarios"
   );
   const [funcionarios, setFuncionarios] = useState<Funcionario[]>([]);
   const [areas, setAreas] = useState<Area[]>([]);
   const [atividades, setAtividades] = useState<Atividade[]>([]);
+  const [usuarios, setUsuarios] = useState<Usuario[]>([]);
+  const [isUserDrawerOpen, setIsUserDrawerOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState<Usuario | null>(null);
+  const [userData, setUserData] = useState({
+    nome: "",
+    email: "",
+    senha: "",
+    permissao: "",
+    funcionario_id: "",
+  });
+  const [isFuncionarioPopoverOpen, setIsFuncionarioPopoverOpen] = useState(false);
+
+  const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
     fetchDados();
@@ -26,16 +53,127 @@ export default function CentralAdministrativa() {
 
   const fetchDados = async () => {
     try {
-      const [{ data: func }, { data: ar }, { data: at }] = await Promise.all([
+      const [{ data: users }, { data: func }, { data: ar }, { data: at }] = await Promise.all([
+        supabase.from("usuarios").select("*").order("nome"),
         supabase.from("funcionarios").select("*").order("nome"),
         supabase.from("areas").select("*").order("nome"),
         supabase.from("atividades").select("*").order("nome"),
       ]);
+      setUsuarios(users ?? []);
       setFuncionarios(func ?? []);
       setAreas(ar ?? []);
       setAtividades(at ?? []);
     } catch (error) {
       console.error("Erro ao carregar dados:", error);
+    }
+  };
+
+  const handleExportarTudo = async () => {
+    setExporting(true);
+    toast.info("Iniciando exportação completa... Isso pode levar um momento.");
+
+    try {
+      const distribuicoesCompletas = await adapterSupabase.getDistribuicaoReal();
+
+      if (!distribuicoesCompletas || distribuicoesCompletas.length === 0) {
+        toast.warning("Nenhuma distribuição encontrada para exportar.");
+        return;
+      }
+
+      const dataParaExportar = distribuicoesCompletas.map((d: any) => ({
+        "ID Distribuição": d.id,
+        "ID Funcionário": d.funcionario_id,
+        "Funcionário": d.funcionario_nome,
+        "Cargo": d.funcionario_cargo,
+        "Unidade": d.funcionario_unidade,
+        "ID Atividade": d.atividade_id,
+        "Atividade": d.atividade_nome,
+        "Diretoria (Área)": d.area_nome_oficial,
+        "Frequência": d.frequencia,
+        "Horas/Ocorrência": d.duracao_ocorrencia_horas,
+        "Ocorrências/Mês": d.quantidade_ocorrencias,
+        "Total Horas/Mês": d.calculado_total_horas,
+      }));
+
+      const worksheet = XLSX.utils.json_to_sheet(dataParaExportar);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Dados Consolidados");
+      XLSX.writeFile(workbook, "Exportacao_Completa_Plataforma.xlsx");
+      toast.success("Exportação concluída com sucesso!");
+    } catch (error) {
+      console.error("Erro ao exportar tudo:", error);
+      toast.error("Ocorreu um erro durante a exportação.");
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  // ---------------- USUÁRIOS ----------------
+  const handleSaveUsuario = async () => {
+    if (!userData.nome || !userData.email || !userData.permissao) {
+      toast.warning("Nome, e-mail e permissão são obrigatórios.");
+      return;
+    }
+
+    if (editingUser) {
+      // Editando
+      const payload: Partial<Usuario> = {
+        nome: userData.nome,
+        email: userData.email,
+        permissao: userData.permissao as any,
+      };
+      if (userData.senha) { // Só atualiza a senha se uma nova for digitada
+        payload.senha_hash = userData.senha;
+      }
+      const { error } = await supabase.from("usuarios").update(payload).eq("id", editingUser.id);
+      if (error) {
+        toast.error("Erro ao atualizar usuário: " + error.message);
+      } else {
+        toast.success("Usuário atualizado com sucesso!");
+        setIsUserDrawerOpen(false);
+        setIsFuncionarioPopoverOpen(false);
+        fetchDados();
+      }
+    } else {
+      // Criando
+      if (!userData.senha) {
+        toast.warning("A senha é obrigatória para novos usuários.");
+        return;
+      }
+      const { error } = await supabase.from("usuarios").insert({
+        nome: userData.nome,
+        email: userData.email,
+        senha_hash: userData.senha,
+        permissao: userData.permissao,
+        funcionario_id: userData.funcionario_id || null,
+        ativo: true,
+        flag_acesso_sistema: true,
+      });
+
+      if (error) {
+        toast.error("Erro ao criar usuário: " + error.message);
+      } else {
+        toast.success("Usuário criado com sucesso!");
+        setIsUserDrawerOpen(false);
+        setIsFuncionarioPopoverOpen(false);
+        fetchDados();
+      }
+    }
+  };
+
+  const openUserDrawer = (user: Usuario | null) => {
+    setEditingUser(user);
+    setUserData(user ? { nome: user.nome ?? '', email: user.email, permissao: user.permissao ?? '', senha: '', funcionario_id: user.funcionario_id ?? '' } : { nome: '', email: '', senha: '', permissao: '', funcionario_id: '' });
+    setIsUserDrawerOpen(true);
+  };
+
+  const handleDeleteUsuario = async (id: string) => {
+    if (!confirm("Tem certeza que deseja excluir este usuário? A ação não pode ser desfeita.")) return;
+    const { error } = await supabase.from("usuarios").delete().eq("id", id);
+    if (error) toast.error("Erro ao excluir usuário: " + error.message);
+    else {
+      toast.success("Usuário excluído.");
+      fetchDados();
     }
   };
 
@@ -160,12 +298,141 @@ export default function CentralAdministrativa() {
         </p>
       </div>
 
+      {/* Botão de Exportação Global */}
+      <div className="mb-6">
+        <Button
+          variant="outline"
+          className="text-blue-600 border-blue-600 hover:bg-blue-50 hover:text-blue-700"
+          onClick={handleExportarTudo}
+          disabled={exporting}
+        >
+          <FileDown className="mr-2" size={18} /> {exporting ? "Exportando..." : "Exportar Dados Consolidados"}
+        </Button>
+      </div>
+
       <Tabs value={aba} onValueChange={(value) => setAba(value as any)}>
         <TabsList>
+          <TabsTrigger value="usuarios">Usuários</TabsTrigger>
           <TabsTrigger value="funcionarios">Funcionários</TabsTrigger>
           <TabsTrigger value="areas">Áreas</TabsTrigger>
           <TabsTrigger value="atividades">Atividades</TabsTrigger>
         </TabsList>
+
+        {/* USUÁRIOS */}
+        <TabsContent value="usuarios">
+          <Card className="mt-4">
+            <CardContent className="p-4">
+              <Drawer 
+                open={isUserDrawerOpen} 
+                onOpenChange={setIsUserDrawerOpen}
+                modal={!isFuncionarioPopoverOpen} // <-- AQUI ESTÁ A CORREÇÃO
+              >
+                <div className="flex justify-between mb-4">
+                  <h2 className="text-lg font-semibold">Usuários da Plataforma</h2>
+                  <DrawerTrigger asChild>
+                    <Button variant="outline" onClick={() => openUserDrawer(null)}>
+                      <PlusCircle className="mr-2" size={16} /> Novo Usuário
+                    </Button>
+                  </DrawerTrigger>
+                </div>
+                <DrawerContent>
+                  <div className="mx-auto w-full max-w-md p-4">
+                    <div className="text-center">
+                      <DrawerTitle>{editingUser ? "Editar Usuário" : "Novo Usuário"}</DrawerTitle>
+                      <DrawerDescription>Preencha as informações abaixo.</DrawerDescription>
+                    </div>
+                    <div className="space-y-4 py-4">
+                      <div>
+                        <Label htmlFor="nome">Nome</Label>
+                        <Input id="nome" value={userData.nome} onChange={(e) => setUserData({ ...userData, nome: e.target.value })} />
+                      </div>
+                      <div>
+                        <Label htmlFor="email">E-mail</Label>
+                        <Input id="email" type="email" value={userData.email} onChange={(e) => setUserData({ ...userData, email: e.target.value })} />
+                      </div>
+                      <div>
+                        <Label htmlFor="senha">Senha</Label>
+                        <Input id="senha" type="password" value={userData.senha} onChange={(e) => setUserData({ ...userData, senha: e.target.value })} placeholder={editingUser ? "Deixe em branco para não alterar" : "Senha de acesso"} />
+                      </div>
+                      <div>
+                        <Label htmlFor="permissao">Permissão</Label>
+                        <Select value={userData.permissao} onValueChange={(value) => setUserData({ ...userData, permissao: value })}>
+                          <SelectTrigger id="permissao">
+                            <SelectValue placeholder="Selecione a permissão" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="admin">Admin</SelectItem>
+                            <SelectItem value="preenchedor">Preenchedor</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label>Funcionário Vinculado (Opcional)</Label>
+                        <Popover open={isFuncionarioPopoverOpen} onOpenChange={setIsFuncionarioPopoverOpen}>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              aria-expanded={isFuncionarioPopoverOpen}
+                              className="w-full justify-between"
+                            >
+                              <span className="truncate">
+                                {userData.funcionario_id
+                                  ? funcionarios.find((f) => f.id === userData.funcionario_id)?.nome
+                                  : "Selecione um funcionário..."}
+                              </span>
+                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-[360px] p-0" side="top" align="start" onOpenAutoFocus={(e) => e.preventDefault()} onInteractOutside={(e) => e.preventDefault()}>
+                            <Command>
+                              <CommandInput placeholder="Buscar funcionário..." />
+                              <CommandEmpty>Nenhum funcionário encontrado.</CommandEmpty>
+                              <CommandGroup className="max-h-60 overflow-y-auto">
+                                {funcionarios.map((f) => (
+                                  <CommandItem
+                                    key={f.id}
+                                    value={f.nome}
+                                    onSelect={() => {
+                                      setUserData({ ...userData, funcionario_id: userData.funcionario_id === f.id ? '' : f.id });
+                                      setIsFuncionarioPopoverOpen(false);
+                                    }}
+                                  >
+                                    <Check className={`mr-2 h-4 w-4 ${userData.funcionario_id === f.id ? "opacity-100" : "opacity-0"}`} />
+                                    {f.nome}
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+                    </div>
+                    <div className="pt-4 flex justify-end gap-2">
+                      <Button onClick={handleSaveUsuario}>Salvar</Button>
+                      <Button variant="outline" onClick={() => setIsUserDrawerOpen(false)}>Cancelar</Button>
+                    </div>
+                  </div>
+                </DrawerContent>
+              </Drawer>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {usuarios.map((u) => (
+                  <div key={`user-${u.id}`} className="border p-3 rounded-xl bg-white shadow-md hover:shadow-lg transition">
+                    <p className="text-sm font-medium"><strong>Nome:</strong> {u.nome ?? "-"}</p>
+                    <p className="text-sm text-muted-foreground"><strong>Email:</strong> {u.email ?? "-"}</p>
+                    <p className="text-sm text-muted-foreground"><strong>Permissão:</strong> {u.permissao ?? "-"}</p>
+                    {u.funcionario_id && <p className="text-xs text-muted-foreground"><strong>ID Func:</strong> {u.funcionario_id.slice(0,8)}...</p>}
+                    <div className="flex gap-2 mt-2">
+                      <Button size="sm" variant="ghost" onClick={() => openUserDrawer(u)}><Pencil size={16} /></Button>
+                      <Button size="sm" variant="ghost" onClick={() => handleDeleteUsuario(u.id)}><Trash2 size={16} /></Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         {/* FUNCIONÁRIOS */}
         <TabsContent value="funcionarios">

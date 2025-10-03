@@ -7,8 +7,9 @@ import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
 import { Drawer, DrawerContent, DrawerTrigger } from "../components/ui/drawer";
 import { Popover, PopoverTrigger, PopoverContent } from "../components/ui/popover";
+import * as XLSX from "xlsx";
 import { Checkbox } from "../components/ui/checkbox";
-import { PlusCircle, Pencil, Trash2, ListTodo } from "lucide-react";
+import { PlusCircle, Pencil, Trash2, ListTodo, FileDown } from "lucide-react";
 import { apiAdapter } from "../adapters/apiAdapter";
 import { supabase } from "../lib/supabase";
 import { toast } from "sonner";
@@ -41,6 +42,7 @@ export default function CadastroAtividadesNovaVisao({ usuario }: Props) {
   const [nivelFiltroModelo, setNivelFiltroModelo] = useState<string>("todos");
   const [modelosDisponiveis, setModelosDisponiveis] = useState<Atividade_Modelo[]>([]);
   const [mostrarModelos, setMostrarModelos] = useState(false);
+  const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
     if (openDrawer && !atividadeEditando) {
@@ -308,6 +310,39 @@ export default function CadastroAtividadesNovaVisao({ usuario }: Props) {
     }
   };
 
+  const handleExport = async () => {
+    if (atividades.length === 0) {
+      toast.info("Nenhuma atividade para exportar com os filtros atuais.");
+      return;
+    }
+
+    setExporting(true);
+    toast.info("Gerando arquivo XLSX...");
+
+    try {
+      const areaNome = areas.find(a => String(a.id) === areaSelecionada)?.nome || "AreaDesconhecida";
+      const ccNomes = centrosCustoSelecionados.join("_").replace(/\s/g, "_");
+
+      const dataToExport = atividades.map(a => ({
+        "ID Atividade": a.id,
+        "Nome": a.nome,
+        "Descrição": a.descricao,
+        "Tipo": a.tipo,
+        "Cliente": a.cliente,
+        "Recursos Necessários": a.recursos_necessarios,
+        "Centro de Custo": a.centro_custo,
+      }));
+
+      const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Atividades");
+      XLSX.writeFile(workbook, `Atividades_${areaNome}_${ccNomes}.xlsx`);
+      toast.success("Arquivo gerado com sucesso!");
+    } finally {
+      setExporting(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white dark:bg-zinc-900 px-8 py-6 transition-colors">
       <div className="flex justify-between items-center mb-6">
@@ -382,6 +417,17 @@ export default function CadastroAtividadesNovaVisao({ usuario }: Props) {
             </Button>
           </div>
 
+        <div className="flex-1 flex items-end">
+          <Button
+            variant="outline"
+            onClick={handleExport}
+            className="text-blue-600 border-blue-600 hover:bg-blue-50 hover:text-blue-700 dark:text-blue-400 dark:border-blue-400 dark:hover:bg-blue-900/20 dark:hover:text-blue-300"
+            disabled={exporting || atividades.length === 0}
+          >
+            <FileDown className="mr-2" size={16} />
+            {exporting ? "Exportando..." : "Exportar Atividades"}
+          </Button>
+        </div>
 
         {/* Botão Nova Atividade */}
         <Drawer open={openDrawer} onOpenChange={(open) => {
@@ -392,7 +438,7 @@ export default function CadastroAtividadesNovaVisao({ usuario }: Props) {
         }}>
           <DrawerTrigger asChild>
             <Button
-              className="bg-yellow-400 text-black hover:brightness-110"
+              className="bg-yellow-500 text-black hover:bg-yellow-400"
               disabled={!areaSelecionada || centrosCustoSelecionados.length === 0}
               onClick={() => {
                 setAtividadeEditando(null); // <- limpa ANTES de abrir
