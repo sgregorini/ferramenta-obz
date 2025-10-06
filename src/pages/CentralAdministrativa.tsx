@@ -116,6 +116,7 @@ export default function CentralAdministrativa() {
               "Funcionário": d.funcionario_nome,
               "Cargo": d.funcionario_cargo,
               "Centro de Custo": d.funcionario_centro_custo,
+              "Diretoria": d.area_nome_oficial,
               "Unidade": d.funcionario_unidade,
               "Gestor (Líder) ID": d.gestor_id,
               "Gestor (Líder) Nome": d.gestor_nome,
@@ -135,6 +136,7 @@ export default function CentralAdministrativa() {
             "Funcionário Pendente": primeiroItem.funcionario_nome,
             "Cargo": primeiroItem.funcionario_cargo,
             "Centro de Custo": primeiroItem.funcionario_centro_custo,
+            "Diretoria": primeiroItem.area_nome_oficial,
             "Unidade": primeiroItem.funcionario_unidade,
             "Gestor (Líder) Nome": primeiroItem.gestor_nome,
           });
