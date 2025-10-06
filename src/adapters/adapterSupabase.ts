@@ -108,6 +108,9 @@ export const adapterSupabase = {
           funcionario_nome,
           funcionario_cargo,
           funcionario_unidade,
+          funcionario_centro_custo,
+          gestor_id,
+          gestor_nome,
           atividade_id,
           atividade_nome,
           frequencia,
@@ -117,8 +120,8 @@ export const adapterSupabase = {
           area_id_oficial,
           area_nome_oficial
         `,
-        // ordena para estabilidade entre páginas
-        (q) => q.order("dp_id", { ascending: false })
+        // Ordena por funcionário para agrupar e depois por ID da distribuição
+        (q) => q.order("funcionario_nome").order("dp_id", { ascending: false })
       );
 
       return (rows || []).map((d: any) => ({
@@ -127,6 +130,9 @@ export const adapterSupabase = {
         funcionario_nome: d.funcionario_nome ?? null,
         funcionario_cargo: d.funcionario_cargo ?? null,
         funcionario_unidade: d.funcionario_unidade ?? null,
+        funcionario_centro_custo: d.funcionario_centro_custo ?? null, // << NOVO
+        gestor_id: normStr(d.gestor_id),                           // << NOVO
+        gestor_nome: d.gestor_nome ?? null,                        // << NOVO
         atividade_id: normStr(d.atividade_id),
         atividade_nome: d.atividade_nome ?? null,
         frequencia: d.frequencia ?? null,

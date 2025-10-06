@@ -19,7 +19,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
-import { Pencil, Trash2, PlusCircle, ShieldCheck, FileDown, ChevronsUpDown, Check } from "lucide-react";
+import { Pencil, Trash2, PlusCircle, ShieldCheck, FileDown, ChevronsUpDown, Check, Loader2 } from "lucide-react";
 
 import { supabase } from "../lib/supabase";
 import { adapterSupabase } from "../adapters/adapterSupabase";
@@ -77,29 +77,84 @@ export default function CentralAdministrativa() {
 
       if (!distribuicoesCompletas || distribuicoesCompletas.length === 0) {
         toast.warning("Nenhuma distribuição encontrada para exportar.");
+        setExporting(false); // Garante que o estado de loading termine aqui
         return;
       }
 
-      const dataParaExportar = distribuicoesCompletas.map((d: any) => ({
-        "ID Distribuição": d.id,
-        "ID Funcionário": d.funcionario_id,
-        "Funcionário": d.funcionario_nome,
-        "Cargo": d.funcionario_cargo,
-        "Unidade": d.funcionario_unidade,
-        "ID Atividade": d.atividade_id,
-        "Atividade": d.atividade_nome,
-        "Diretoria (Área)": d.area_nome_oficial,
-        "Frequência": d.frequencia,
-        "Horas/Ocorrência": d.duracao_ocorrencia_horas,
-        "Ocorrências/Mês": d.quantidade_ocorrencias,
-        "Total Horas/Mês": d.calculado_total_horas,
-      }));
+      // Usamos um Map para garantir que cada funcionário apareça, mesmo sem distribuição.
+      const funcionariosMap = new Map<string, any[]>();
 
-      const worksheet = XLSX.utils.json_to_sheet(dataParaExportar);
+      distribuicoesCompletas.forEach((d: any) => {
+        if (!funcionariosMap.has(d.funcionario_id)) {
+          funcionariosMap.set(d.funcionario_id, []);
+        }
+        // Adiciona a distribuição se ela existir (atividade_id não é nulo)
+        if (d.atividade_id) {
+          funcionariosMap.get(d.funcionario_id)!.push(d);
+        } else {
+          // Se não tem atividade, garante que o funcionário está no mapa para a linha em branco
+          if (funcionariosMap.get(d.funcionario_id)!.length === 0) {
+             funcionariosMap.get(d.funcionario_id)!.push(d);
+          }
+        }
+      });
+
+      const dataParaExportar: any[] = [];
+      const pendentesParaExportar: any[] = [];
+
+      // Itera sobre o mapa de funcionários para separar os dados
+      for (const distribuicoesFuncionario of funcionariosMap.values()) {
+        const primeiroItem = distribuicoesFuncionario[0];
+
+        // Verifica se o funcionário tem alguma atividade (se a primeira linha tem atividade_id)
+        if (primeiroItem && primeiroItem.atividade_id) {
+          // Se tem, adiciona todas as suas distribuições à lista principal
+          distribuicoesFuncionario.forEach(d => {
+            dataParaExportar.push({
+              "ID Distribuição": d.id,
+              "ID Funcionário": d.funcionario_id, // Mantido para referência
+              "Funcionário": d.funcionario_nome,
+              "Cargo": d.funcionario_cargo,
+              "Centro de Custo": d.funcionario_centro_custo,
+              "Unidade": d.funcionario_unidade,
+              "Gestor (Líder) ID": d.gestor_id,
+              "Gestor (Líder) Nome": d.gestor_nome,
+              "ID Atividade": d.atividade_id,
+              "Atividade": d.atividade_nome,
+              "Diretoria (Área)": d.area_nome_oficial,
+              "Frequência": d.frequencia,
+              "Horas/Ocorrência": d.duracao_ocorrencia_horas,
+              "Ocorrências/Mês": d.quantidade_ocorrencias,
+              "Total Horas/Mês": d.calculado_total_horas ?? 0,
+            });
+          });
+        } else {
+          // Se não tem, adiciona à lista de pendentes
+          pendentesParaExportar.push({
+            "ID Funcionário": primeiroItem.funcionario_id,
+            "Funcionário Pendente": primeiroItem.funcionario_nome,
+            "Cargo": primeiroItem.funcionario_cargo,
+            "Centro de Custo": primeiroItem.funcionario_centro_custo,
+            "Unidade": primeiroItem.funcionario_unidade,
+            "Gestor (Líder) Nome": primeiroItem.gestor_nome,
+          });
+        }
+      }
+
       const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, "Dados Consolidados");
+
+      // Cria a planilha de dados consolidados
+      const worksheetPrincipal = XLSX.utils.json_to_sheet(dataParaExportar);
+      XLSX.utils.book_append_sheet(workbook, worksheetPrincipal, "Dados Consolidados");
+
+      // Cria a planilha de pendentes, se houver
+      if (pendentesParaExportar.length > 0) {
+        const worksheetPendentes = XLSX.utils.json_to_sheet(pendentesParaExportar);
+        XLSX.utils.book_append_sheet(workbook, worksheetPendentes, "Pendentes de Preenchimento");
+      }
+
       XLSX.writeFile(workbook, "Exportacao_Completa_Plataforma.xlsx");
-      toast.success("Exportação concluída com sucesso!");
+      toast.success("Exportação concluída! O download deve começar em breve.");
     } catch (error) {
       console.error("Erro ao exportar tudo:", error);
       toast.error("Ocorreu um erro durante a exportação.");
@@ -306,7 +361,12 @@ export default function CentralAdministrativa() {
           onClick={handleExportarTudo}
           disabled={exporting}
         >
-          <FileDown className="mr-2" size={18} /> {exporting ? "Exportando..." : "Exportar Dados Consolidados"}
+          {exporting ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <FileDown className="mr-2" size={18} />
+          )}
+          {exporting ? "Exportando..." : "Exportar Dados Consolidados"}
         </Button>
       </div>
 

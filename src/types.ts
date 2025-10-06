@@ -65,6 +65,9 @@ export interface Distribuicao {
   duracao_ocorrencia_horas?: number | null;
   quantidade_ocorrencias?: number | null;
   calculado_total_horas?: number | null;
+  funcionario_centro_custo?: string | null; // Adicionado
+  gestor_id?: string | null;               // Adicionado
+  gestor_nome?: string | null;             // Adicionado
 }
 
 export interface Usuario {
