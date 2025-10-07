@@ -74,6 +74,13 @@ export default function CentralAdministrativa() {
 
     try {
       const distribuicoesCompletas = await adapterSupabase.getDistribuicaoReal();
+      
+      // Busca adicional para garantir que temos a área de TODOS os funcionários
+      const { data: todosFuncionarios } = await supabase.from("funcionarios").select('id, area_id');
+      const { data: todasAreas } = await supabase.from("areas").select('id, nome');
+      const areaMap = new Map(todasAreas?.map(a => [a.id, a.nome]));
+      const funcionarioAreaMap = new Map(todosFuncionarios?.map(f => [f.id, areaMap.get(f.area_id ?? -1)]));
+
 
       if (!distribuicoesCompletas || distribuicoesCompletas.length === 0) {
         toast.warning("Nenhuma distribuição encontrada para exportar.");
@@ -82,20 +89,17 @@ export default function CentralAdministrativa() {
       }
 
       // Usamos um Map para garantir que cada funcionário apareça, mesmo sem distribuição.
-      const funcionariosMap = new Map<string, any[]>();
+      const funcionariosMap = new Map<string, { info: any; distribuicoes: any[] }>();
 
       distribuicoesCompletas.forEach((d: any) => {
         if (!funcionariosMap.has(d.funcionario_id)) {
-          funcionariosMap.set(d.funcionario_id, []);
+          // Armazena a primeira ocorrência, que tem os dados do funcionário
+          funcionariosMap.set(d.funcionario_id, { info: d, distribuicoes: [] });
         }
         // Adiciona a distribuição se ela existir (atividade_id não é nulo)
         if (d.atividade_id) {
-          funcionariosMap.get(d.funcionario_id)!.push(d);
-        } else {
-          // Se não tem atividade, garante que o funcionário está no mapa para a linha em branco
-          if (funcionariosMap.get(d.funcionario_id)!.length === 0) {
-             funcionariosMap.get(d.funcionario_id)!.push(d);
-          }
+          // Adiciona apenas as linhas que são de fato distribuições
+          funcionariosMap.get(d.funcionario_id)!.distribuicoes.push(d);
         }
       });
 
@@ -103,13 +107,13 @@ export default function CentralAdministrativa() {
       const pendentesParaExportar: any[] = [];
 
       // Itera sobre o mapa de funcionários para separar os dados
-      for (const distribuicoesFuncionario of funcionariosMap.values()) {
-        const primeiroItem = distribuicoesFuncionario[0];
+      for (const { info, distribuicoes } of funcionariosMap.values()) {
+        const primeiroItem = info; // Agora 'info' sempre tem os dados do funcionário
 
         // Verifica se o funcionário tem alguma atividade (se a primeira linha tem atividade_id)
-        if (primeiroItem && primeiroItem.atividade_id) {
+        if (distribuicoes.length > 0) {
           // Se tem, adiciona todas as suas distribuições à lista principal
-          distribuicoesFuncionario.forEach(d => {
+          distribuicoes.forEach(d => {
             dataParaExportar.push({
               "ID Distribuição": d.id,
               "ID Funcionário": d.funcionario_id, // Mantido para referência
@@ -136,7 +140,7 @@ export default function CentralAdministrativa() {
             "Funcionário Pendente": primeiroItem.funcionario_nome,
             "Cargo": primeiroItem.funcionario_cargo,
             "Centro de Custo": primeiroItem.funcionario_centro_custo,
-            "Diretoria": primeiroItem.area_func_nome,
+            "Diretoria": funcionarioAreaMap.get(primeiroItem.funcionario_id) ?? "Sem diretoria",
             "Unidade": primeiroItem.funcionario_unidade,
             "Gestor (Líder) Nome": primeiroItem.gestor_nome,
           });

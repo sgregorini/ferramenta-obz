@@ -100,29 +100,29 @@ export const adapterSupabase = {
      =========================================================== */
   async getDistribuicaoReal(): Promise<Distribuicao[]> {
     try {
-      const rows = await fetchAllRows<any>(
-        "vw_distribuicao_completa",
-        `
-          dp_id,
-          funcionario_id,
-          funcionario_nome,
-          funcionario_cargo,
-          funcionario_unidade,
-          funcionario_centro_custo,
-          gestor_id,
-          gestor_nome,
-          atividade_id,
-          atividade_nome,
-          frequencia,
-          duracao_ocorrencia_horas,
-          quantidade_ocorrencias,
-          calculado_total_horas,
-          area_id_oficial,
-          area_nome_oficial
-        `,
-        // Ordena por funcionário para agrupar e depois por ID da distribuição
-        (q) => q.order("funcionario_nome").order("dp_id", { ascending: false })
-      );
+      const { data: rows, error } = await supabase
+        .from("vw_distribuicao_completa")
+        .select(`
+            dp_id,
+            funcionario_id,
+            funcionario_nome,
+            funcionario_cargo,
+            funcionario_unidade,
+            funcionario_centro_custo,
+            gestor_id,
+            gestor_nome,
+            atividade_id,
+            atividade_nome,
+            frequencia,
+            duracao_ocorrencia_horas,
+            quantidade_ocorrencias,
+            calculado_total_horas,
+            area_id_oficial,
+            area_nome_oficial
+          `)
+        .order("funcionario_nome").order("dp_id", { ascending: false });
+
+      if (error) throw error;
 
       return (rows || []).map((d: any) => ({
         id: normStr(d.dp_id),
@@ -131,8 +131,8 @@ export const adapterSupabase = {
         funcionario_cargo: d.funcionario_cargo ?? null,
         funcionario_unidade: d.funcionario_unidade ?? null,
         funcionario_centro_custo: d.funcionario_centro_custo ?? null, // << NOVO
-        gestor_id: normStr(d.gestor_id),                           // << NOVO
-        gestor_nome: d.gestor_nome ?? null,                        // << NOVO
+        gestor_id: normStr(d.gestor_id),
+        gestor_nome: d.gestor_nome ?? null,
         atividade_id: normStr(d.atividade_id),
         atividade_nome: d.atividade_nome ?? null,
         frequencia: d.frequencia ?? null,
