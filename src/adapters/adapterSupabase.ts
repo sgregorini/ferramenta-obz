@@ -100,29 +100,28 @@ export const adapterSupabase = {
      =========================================================== */
   async getDistribuicaoReal(): Promise<Distribuicao[]> {
     try {
-      const { data: rows, error } = await supabase
-        .from("vw_distribuicao_completa")
-        .select(`
-            dp_id,
-            funcionario_id,
-            funcionario_nome,
-            funcionario_cargo,
-            funcionario_unidade,
-            funcionario_centro_custo,
-            gestor_id,
-            gestor_nome,
-            atividade_id,
-            atividade_nome,
-            frequencia,
-            duracao_ocorrencia_horas,
-            quantidade_ocorrencias,
-            calculado_total_horas,
-            area_id_oficial,
-            area_nome_oficial
-          `)
-        .order("funcionario_nome").order("dp_id", { ascending: false });
-
-      if (error) throw error;
+      const rows = await fetchAllRows<any>(
+        "vw_distribuicao_completa",
+        `
+          dp_id,
+          funcionario_id,
+          funcionario_nome,
+          funcionario_cargo,
+          funcionario_unidade,
+          funcionario_centro_custo,
+          gestor_id,
+          gestor_nome,
+          atividade_id,
+          atividade_nome,
+          frequencia,
+          duracao_ocorrencia_horas,
+          quantidade_ocorrencias,
+          calculado_total_horas,
+          area_id_oficial,
+          area_nome_oficial
+        `,
+        (q) => q.order("funcionario_nome").order("dp_id", { ascending: false })
+      );
 
       return (rows || []).map((d: any) => ({
         id: normStr(d.dp_id),
@@ -130,7 +129,7 @@ export const adapterSupabase = {
         funcionario_nome: d.funcionario_nome ?? null,
         funcionario_cargo: d.funcionario_cargo ?? null,
         funcionario_unidade: d.funcionario_unidade ?? null,
-        funcionario_centro_custo: d.funcionario_centro_custo ?? null, // << NOVO
+        funcionario_centro_custo: d.funcionario_centro_custo ?? null,
         gestor_id: normStr(d.gestor_id),
         gestor_nome: d.gestor_nome ?? null,
         atividade_id: normStr(d.atividade_id),
