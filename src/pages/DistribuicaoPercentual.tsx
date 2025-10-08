@@ -137,6 +137,7 @@ const LinhaAtividade = memo(function LinhaAtividade({
   initial,
   modoLote,
   onCommit,
+  onDelete,
 }: {
   atividadeNome: string;
   cargaMensal: number;
@@ -148,6 +149,7 @@ const LinhaAtividade = memo(function LinhaAtividade({
     quantidade_ocorrencias: number;
     frequencia: Frequencia | "";
   }) => void;
+  onDelete: () => void;
 }) {
   const [draft, setDraft] = useState<LinhaValue>(initial);
   const shouldCommitRef = useRef(false);
@@ -213,8 +215,18 @@ const LinhaAtividade = memo(function LinhaAtividade({
         <span className="truncate" title={atividadeNome}>
           {atividadeNome}
         </span>
-        {!modoLote && total > 0 && (
-          <span className="text-[11px] text-zinc-500">({total.toFixed(1)}h/m)</span>
+        {!modoLote && total > 0 && !invalida && (
+          <>
+            <span className="text-[11px] text-zinc-500">({total.toFixed(1)}h/m)</span>
+            <button
+              type="button"
+              onClick={onDelete}
+              className="text-zinc-400 hover:text-red-500"
+              title="Remover esta atividade"
+            >
+              <XCircle className="h-3.5 w-3.5" />
+            </button>
+          </>
         )}
         {warnAltaMensal && <TriangleAlert className="h-3.5 w-3.5 text-amber-500" />}
         {invalida && (
@@ -656,6 +668,21 @@ export default function DistribuicaoPercentual({ usuario }: { usuario: Usuario }
       return { ...prev, [fid]: novo };
     });
     setDirtyIds((s) => new Set(s).add(fid));
+  };
+
+  const removerLinhaSingle = (fid: string, atividade_id: string) => {
+    setDistribuicoes((prev) => {
+      const curr = prev[fid] || [];
+      // Filtra mantendo apenas as atividades que NÃO são a que queremos remover
+      const novo = curr.filter((d) => d.atividade_id !== atividade_id);
+      return { ...prev, [fid]: novo };
+    });
+    // Marca como sujo para habilitar o botão de salvar
+    setDirtyIds((s) => new Set(s).add(fid));
+    toast.info(
+      "Atividade removida. Clique em 'Salvar alterações' para confirmar.",
+      { duration: 5000 }
+    );
   };
 
   const commitLinhaBulk = (
@@ -1317,6 +1344,9 @@ export default function DistribuicaoPercentual({ usuario }: { usuario: Usuario }
                                   ? commitLinhaSingle(selecionado.id, val)
                                   : null;
 
+                              const onDelete = () =>
+                                selecionado ? removerLinhaSingle(selecionado.id, a.id) : null;
+
                               return (
                                 <LinhaAtividade
                                   key={`${a.id}-${selecionado?.id ?? "lote"}`}
@@ -1325,6 +1355,7 @@ export default function DistribuicaoPercentual({ usuario }: { usuario: Usuario }
                                   initial={initial}
                                   modoLote={modoLote}
                                   onCommit={onCommit!}
+                                  onDelete={onDelete}
                                 />
                               );
                             })}

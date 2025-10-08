@@ -233,19 +233,30 @@ export const adapterSupabase = {
       .filter(Boolean) as any[];
 
     try {
-      const { error, status } = await supabase
+      // 1. Deletar todas as distribuições existentes para este funcionário
+      const { error: deleteError } = await supabase
         .from("distribuicao_percentual")
-        .upsert(registros, {
-          onConflict: "funcionario_id,atividade_id",
-          ignoreDuplicates: false,
-          defaultToNull: false,
-        });
+        .delete()
+        .eq("funcionario_id", fid);
 
-      if (error) {
-        console.error("upsert distribuicao_percentual error:", { status, error });
-        return { error };
+      if (deleteError) {
+        console.error("salvarDistribuicoes (delete step) error:", { error: deleteError });
+        throw deleteError; // Interrompe a execução se a exclusão falhar
       }
-      return { error: null };
+
+      // 2. Inserir as novas distribuições (se houver alguma)
+      if (registros.length > 0) {
+        const { error: insertError } = await supabase
+          .from("distribuicao_percentual")
+          .insert(registros);
+
+        if (insertError) {
+          console.error("salvarDistribuicoes (insert step) error:", { error: insertError });
+          throw insertError; // Lança o erro para ser pego pelo catch
+        }
+      }
+
+      return { error: null }; // Sucesso
     } catch (e) {
       console.error("salvarDistribuicoes exception:", e);
       return { error: e };
